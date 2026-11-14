@@ -2893,7 +2893,9 @@
     dream.fade = setTimeout(function () { placeDream(x, y); dream.group.style.opacity = ''; }, FADE_MS);
   }
   function renderDream(nowMs) {
-    // at=<ISO time> (a test) moves the dim screen's clock with Home's.
+    // at=<ISO time> (a test) moves the dim screen's clock with Home's; how long it has been on, and drifting, keep
+    // real time (with the moved clock it drifted every second).
+    var realMs = nowMs;
     nowMs += home.shift;
     var minute = Math.floor(nowMs / 60000), d = dream.day;
     var arrived = d && Text.secondsUntil(d.nextTime, nowMs) === 0;
@@ -2917,14 +2919,14 @@
     dream.radio.style.display = on ? '' : 'none';
     if (on) setText(dream.rtext, t.station(station()) + t.sep() + t.radioStatus(Radio.state));
     var minutes = S.radioDark;
-    var due = on && minutes >= 0 && nowMs - dream.start >= minutes * 60000;
+    var due = on && minutes >= 0 && realMs - dream.start >= minutes * 60000;
     if (due !== dream.dark) {
       dream.dark = due;
       dream.group.style.visibility = due ? 'hidden' : '';
       panel(due, false);
     }
     setBarsLive(dream.bars, on && !due && Radio.state === Radio.PLAYING);
-    if (!due && nowMs - dream.lastDrift >= DRIFT_MS) drift();
+    if (!due && realMs - dream.lastDrift >= DRIFT_MS) drift();
   }
 
   // Radio off ends both (ScreenOffActivity finishes; on LG the dim screen is the radio's).
