@@ -17,3 +17,6 @@ service/prayer.js
 service/text.js
 service/state.json
 service/announce/
+
+# Throwaway files (they belong in the project folder's .tmp, one level up)
+.tmp/

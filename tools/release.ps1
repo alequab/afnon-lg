@@ -3,6 +3,7 @@
 # without the copied icons. The version is app/appinfo.json's; TVs update to a release whose tag (vX.Y.Z) is newer.
 #   powershell -ExecutionPolicy Bypass -File tools\release.ps1
 # Then: gh release create vX.Y.Z output\release\tv.afnon.launcher_X.Y.Z_all.ipk --notes-file <notes>
+# The release's title and notes are in both languages, Arabic first, then English (README: Releasing).
 $ErrorActionPreference = 'Stop'
 $local = Join-Path $PSScriptRoot 'env.local.ps1'
 if (Test-Path $local) { . $local }

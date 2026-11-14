@@ -1,10 +1,30 @@
-<div dir="rtl">
+<div dir="rtl" align="center">
 
-بسم الله الرحمن الرحيم
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/opening-dark.png">
+  <source media="(prefers-color-scheme: light)" srcset="docs/opening-light.png">
+  <img src="docs/opening-dark.png" alt="بسم الله الرحمن الرحيم، والصلاة والسلام على نبينا محمد" width="560">
+</picture>
 
-والصلاة والسلام على رسول الله، أما بعد:
+<br>
 
-# أفنون LG · Afnon LG
+<h2>أفنون LG · Afnon LG</h2>
+
+**مواقيت الصلاة والأذان شاشةً رئيسية لتلفاز LG بعد الروت**
+
+*Prayer times and the adhan as the Home screen of a rooted LG TV*
+
+<br>
+
+### [العربية](#العربية) &nbsp;·&nbsp; [English](#english)
+
+</div>
+
+---
+
+<div dir="rtl" lang="ar">
+
+## العربية
 
 نسخة الشاشة الرئيسية من أفنون LG، لتلفازات LG بعد الروت. (نسخة متجر LG التي لا تحتاج روتًا في
 [alequab/afnon-webos](https://github.com/alequab/afnon-webos)، ولا تُثبَّت النسختان معًا.)
@@ -96,7 +116,7 @@
 
 ---
 
-# Afnon LG
+## English
 
 The Home-screen edition of Afnon LG, for rooted LG TVs. (The LG Content Store edition, no root needed, is
 [alequab/afnon-webos](https://github.com/alequab/afnon-webos); don't install both.)
@@ -239,7 +259,8 @@ its service): uninstall it (Homebrew Channel or `appInstallService/dev/remove`),
 1. Set `version` in `app/appinfo.json` and move the changelog's Unreleased section under it.
 2. `powershell -ExecutionPolicy Bypass -File tools\release.ps1` builds `output\release\tv.afnon.launcher_<version>_all.ipk`
    without the recordings.
-3. `gh release create v<version> output\release\tv.afnon.launcher_<version>_all.ipk --notes-file <notes>`.
+3. `gh release create v<version> output\release\tv.afnon.launcher_<version>_all.ipk --title "الإصدار <version> · Version <version>" --notes-file <notes>`,
+   with the notes in Arabic first (What's new's lines for that version), then English (the changelog's section).
    TVs pick it up within a day.
 
 ## Trying things in a browser
