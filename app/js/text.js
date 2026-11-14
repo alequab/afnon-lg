@@ -330,6 +330,8 @@
    */
   T.news = function () {
     if (this.ar) return [
+      ['1.3.1',
+        'الشاشة الخافتة تعرض الصيام بأيقونته تحت العدّ التنازلي، ثم وقت انتهاء السحور'],
       ['1.3.0',
         'تذكير بالصيام: في الليلة التي تسبق صيام التطوع، مع الحديث في فضله',
         'الاسم الآن أفنون LG',
@@ -358,6 +360,8 @@
         'هذه الصفحة: ما الجديد في كل إصدار']
     ];
     return [
+      ['1.3.1',
+        "The dim screen shows the fast with its icon under the countdown, then when suhoor ends"],
       ['1.3.0',
         'Fasting reminders: the evening before a voluntary fast, with the hadith on its virtue',
         'The name is now Afnon LG',

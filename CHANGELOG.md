@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.3.1] - 2026-11-14
+
+### Changed
+- The dim screen shows a fast as Afnon's screensaver does on the TCL: under the time left, the fast's icon (the full
+  moon, the Kaaba, Arafah's hill, a calendar for Mondays and Thursdays) and «غدًا: …», then «السحور حتى …». On a
+  fast's evening the column starts higher and two gaps are smaller, so the radio row stays inside the arch.
+- Settings → What's new has 1.3.1.
+
+### Added
+- Test hooks: `at=<ISO time>` now moves the dim screen's clock and the fasting card's own check with Home's (calls
+  and reminders keep real time, and a test doesn't mark the fast as shown); `test=dim` shows the dim screen without
+  starting the radio.
+
 ## [1.3.0] - 2026-11-14
 
 ### Added

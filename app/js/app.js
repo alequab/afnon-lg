@@ -1588,15 +1588,24 @@
     clearTimeout(home.cardTimer);
     home.cardTimer = setTimeout(function () { if (home.card === card) dismissReminder(); }, quiet ? QUIET_CARD_MS : FAST_CARD_MS);
   }
-  /** The fast's card, once for its date, when it is due and Home is in front. */
+  /**
+   * The fast's card, once for its date, when it is due and Home is in front. With at= (a test) it runs at Home's
+   * moved clock and remembers the date only until the page restarts, so the real evening still has its card.
+   */
+  var testFasted = '';
   function fastTick(nowMs) {
     if (screen !== home || home.card || dream.on || offv.on || ch.on) return;
-    var d = watch.day, f = fastUpcoming(d, nowMs);
+    var test = home.shift !== 0;
+    if (test) nowMs += home.shift;
+    var d = test ? dayAt(nowMs) : watch.day, f = fastUpcoming(d, nowMs);
     if (!f || !f.tomorrow) return;
     var key = f.year + '-' + f.month + '-' + f.day;
-    if (key === S.fasted) return;
-    S.fasted = key;
-    saveSettings();
+    if (key === (test ? testFasted : S.fasted)) return;
+    if (test) testFasted = key;
+    else {
+      S.fasted = key;
+      saveSettings();
+    }
     showFast(f.kind, f.day, f.month, d.suhoorEnd);
   }
 
@@ -2884,6 +2893,8 @@
     dream.fade = setTimeout(function () { placeDream(x, y); dream.group.style.opacity = ''; }, FADE_MS);
   }
   function renderDream(nowMs) {
+    // at=<ISO time> (a test) moves the dim screen's clock with Home's.
+    nowMs += home.shift;
     var minute = Math.floor(nowMs / 60000), d = dream.day;
     var arrived = d && Text.secondsUntil(d.nextTime, nowMs) === 0;
     if (!d || arrived || minute !== dream.minute) {
@@ -3216,6 +3227,8 @@
       if (screen !== home) show('home');
       tick(true);
     }
+    // test=dim: the dim screen now, without starting the radio (test=dream starts it); with at=, at that moment.
+    if (kind === 'dim') showDream();
     else if (kind === 'radio') radioToggle();
     else if (kind === 'lunaoff') {
       // The service's own luna route, which this firmware denies to Developer Mode apps (kept to check again).
