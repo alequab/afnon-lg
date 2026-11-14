@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- With the reminder or fasting card open on Home, the Magic Remote's pointer resting over a tile took the focus, so
+  OK opened that app instead of closing the card (on the TV: LG's Photo & Video, which asks for the PIN). Only the
+  card's buttons take the focus now, as with the radio card.
+- Test hook `at=` with the dim screen: it faded and moved every second (it compared the moved clock with the real
+  moment it last moved). Drifting and the radio's dark time keep real time.
+
 ## [1.3.1] - 2026-11-14
 
 ### Changed
