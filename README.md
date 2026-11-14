@@ -8,11 +8,11 @@
 
 <br>
 
-<h2>أفنون LG · Afnon LG</h2>
+<h2>أفنون LG</h2>
 
 **مواقيت الصلاة والأذان شاشةً رئيسية لتلفاز LG بعد الروت**
 
-*Prayer times and the adhan as the Home screen of a rooted LG TV*
+*Afnon LG: prayer times and the adhan as the Home screen of a rooted LG TV*
 
 <br>
 
