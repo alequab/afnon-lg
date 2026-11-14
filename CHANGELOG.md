@@ -1,6 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [1.3.2] - 2026-11-14
+
+### Changed
+- Settings → What's new has 1.3.2.
 
 ### Fixed
 - With the reminder or fasting card open on Home, the Magic Remote's pointer resting over a tile took the focus, so

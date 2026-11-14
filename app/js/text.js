@@ -330,6 +330,8 @@
    */
   T.news = function () {
     if (this.ar) return [
+      ['1.3.2',
+        'مؤشر الريموت لا ينقل التحديد خارج بطاقة التذكير أو الصيام، فلا يفتح OK تطبيقًا آخر'],
       ['1.3.1',
         'الشاشة الخافتة تعرض الصيام بأيقونته تحت العدّ التنازلي، ثم وقت انتهاء السحور'],
       ['1.3.0',
@@ -360,6 +362,8 @@
         'هذه الصفحة: ما الجديد في كل إصدار']
     ];
     return [
+      ['1.3.2',
+        "The remote's pointer no longer moves the focus off the reminder or fasting card, so OK doesn't open another app"],
       ['1.3.1',
         "The dim screen shows the fast with its icon under the countdown, then when suhoor ends"],
       ['1.3.0',
