@@ -3070,8 +3070,11 @@
     if (!x || x === stage || x === cur) return;
     if (ch.on && x.parentNode !== ch.list) return;
     if (day.picker && day.picker.on) return;
-    // With the radio card open, only its buttons; while a Settings row is edited, nothing else.
+    // With the radio card open, only its buttons; with the reminder or fasting card, only the card's (a tile under the
+    // resting pointer took the focus, and OK opened it: LG's Photo & Video and its PIN); while a Settings row is
+    // edited, nothing else.
     if (screen === home && home.rcOpen && home.cardBtns.indexOf(x) < 0) return;
+    if (screen === home && home.card && !home.card.contains(x)) return;
     if (screen === set && set.editing) return;
     if (screen === set) {
       for (var s = 0; s < SECTIONS; s++) if (set.nav[s] === x) { if (set.section !== s) showSection(s); return focusNav(); }
