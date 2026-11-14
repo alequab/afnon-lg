@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.3.0] - 2026-11-14
 
 ### Added
 - **Fasting reminders** (from Afnon's TCL build), Settings → Reminders → «تذكير الصيام», one switch for each: the
@@ -17,11 +17,14 @@
   selected. It is now gold words and a check at the end.
 - The method's help says «بزيادة 1 دقيقة», not «1 دقائق» (the methods that add a minute to Dhuhr).
 - Settings → Reminders → Spoken reminder says it plays «حان الآن موعد صلاة …», as it does since the last change.
+- Self-updates follow GitHub's redirects when asking for the latest release, so they keep working if the
+  repository is renamed.
 - Settings rows fit above the key hints when a section has nine of them (Reminders, with the fasting row).
 - Settings → Radio → Screen off while listening: its English help no longer runs past the row ("Saves power · the
   radio plays on · any key wakes it").
 
 ### Changed
+- Settings → What's new has 1.3.0.
 - **The name is now Afnon LG** (أفنون LG), as egyjs agreed in afnon-android-tv-launcher#31: the app's title on the TV, the README and the website. This is the Home-screen edition for rooted TVs; the store edition (`tv.afnon.lg`, alequab/afnon-webos) has the same name. The app id and the repository stay as they are, so updates keep coming.
 - On Friday the spoken lines use Dhuhr's recordings («حان الآن موعد صلاة الظهر» in Lutfi Khamis's voice) instead
   of the old computer voice's Jumu'ah lines, until Jumu'ah is recorded in the same voice (`JUMUAH_CLIPS`).

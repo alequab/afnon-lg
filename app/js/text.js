@@ -330,6 +330,11 @@
    */
   T.news = function () {
     if (this.ar) return [
+      ['1.3.0',
+        'تذكير بالصيام: في الليلة التي تسبق صيام التطوع، مع الحديث في فضله',
+        'الاسم الآن أفنون LG',
+        'التذكير قبل الصلاة بصوت لطفي خميس: «حان الآن موعد صلاة …»',
+        'في القوائم صف واحد محدد، والاختيار الحالي بعلامة ✓'],
       ['1.2.0',
         'المشغّل هو الشاشة الرئيسية: زر Home يفتحه بدل شريط LG',
         'إيقاف إعلانات LG وتتبّع المشاهدة وسجلات الإرسال، في الذاكرة فقط',
@@ -353,6 +358,11 @@
         'هذه الصفحة: ما الجديد في كل إصدار']
     ];
     return [
+      ['1.3.0',
+        'Fasting reminders: the evening before a voluntary fast, with the hadith on its virtue',
+        'The name is now Afnon LG',
+        "The reminder before a prayer in Lutfi Khamis's voice: «حان الآن موعد صلاة …»",
+        'Lists highlight one row; the current choice has a check'],
       ['1.2.0',
         "The launcher is the TV's Home: the Home button opens it instead of LG's bar",
         "LG's ads, viewing tracking and telemetry off, in memory only",
