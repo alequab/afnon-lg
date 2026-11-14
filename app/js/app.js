@@ -1541,6 +1541,8 @@
   }
 
   var FAST_CARD_MS = 20000, QUIET_CARD_MS = 8000;
+  /** Each kind's icon (Fasts.icon): the full moon, the Kaaba, Arafah's hill, the moon, and a calendar for Mon/Thu. */
+  var FAST_ICONS = ['fullmoon', 'kaaba', 'mountain', 'moon', 'moon', 'moon', 'calendar', 'calendar'];
   /**
    * A voluntary fast tomorrow: its icon, its day among its days as dots, the hadith on its virtue with the source,
    * and the fast's date with suhoor's end as a pill; at the bottom end like the reminder card, with Got it. Monday
@@ -1555,7 +1557,7 @@
     card.style.top = '';
     card.style.bottom = '56px';
     var row = el('div', 'frow', card);
-    row.appendChild(icon(['fullmoon', 'kaaba', 'mountain', 'moon', 'moon', 'moon', 'calendar', 'calendar'][kind], quiet ? 52 : 64, 1.6, 'ficon'));
+    row.appendChild(icon(FAST_ICONS[kind], quiet ? 52 : 64, 1.6, 'ficon'));
     var words = el('div', 'fwords', row);
     el('div', 'lbl caps', words, t.fastLabel());
     el('div', 'title dispb', words, t.fastTitle(kind, hijriDay));
@@ -2832,16 +2834,19 @@
     var c = el('div', 'dcol', g);
     dream.clock = timeEl(c, 'dclock disp num tnum');
     dream.date = el('div', 'ddate', c);
-    // The evening before a fast until its Fajr: its name, and suhoor's end under it (one line won't fit the arch).
-    dream.fast = el('div', 'dfast', c);
-    dream.fname = el('div', null, dream.fast);
-    dream.fsuhoor = el('div', null, dream.fast);
     el('div', 'drule', c);
     dream.next = el('div', 'dnext', c);
     dream.left = el('div', 'dleft', c);
     var r = dream.radio = el('div', 'drow', c);
     dream.bars = bars(r, 3, 22, 20);
     dream.rtext = el('div', 'dradio', r);
+    // The evening before a fast until its Fajr, as Afnon's screensaver: the fast's icon and «غدًا: يوم عرفة», then
+    // «السحور حتى …» under it (one line won't fit the arch).
+    dream.fast = el('div', 'dfast', c);
+    var fr = el('div', 'dfrow', dream.fast);
+    dream.ficon = fr.appendChild(icon('moon', 24, 1.6));
+    dream.fname = el('span', null, fr);
+    dream.fsuhoor = el('div', 'dsuhoor', dream.fast);
     dream.ask = el('div', 'dleft', c, t.allowPanel());
     dream.ask.style.display = 'none';
   }
@@ -2890,6 +2895,7 @@
       // The evening before a fast until its Fajr: its name and suhoor's end.
       var fast = fastUpcoming(d, nowMs);
       setText(dream.fname, fast ? t.fastHome(fast.kind, fast.tomorrow) : '');
+      if (fast) setIcon(dream.ficon, FAST_ICONS[fast.kind]);
       setText(dream.fsuhoor, fast ? t.suhoorEnds(clockText(d.suhoorEnd)) : '');
       dream.fast.style.display = fast ? '' : 'none';
       dream.fast.parentNode.classList.toggle('fast', !!fast);

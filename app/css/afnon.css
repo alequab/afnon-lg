@@ -429,10 +429,15 @@ html.night .appicon img { filter: brightness(0.6) sepia(0.25); }
 /* With a fast's two lines the column starts higher and the rule is tighter, so the radio row stays in the arch. */
 .dcol.fast { top: 170px; }
 .dcol.fast .drule { margin: 18px 0 12px; }
+.dcol.fast .drow { margin-top: 14px; }
 .dclock { font-size: 128px; line-height: 1; color: var(--dream-ink); white-space: nowrap; }
 .dclock .m { font-size: 0.35em; }
 .ddate { margin-top: 10px; font-size: 24px; color: var(--dream-dim); }
-.dfast { margin-top: 6px; font-size: 22px; line-height: 1.4; text-align: center; white-space: nowrap; color: var(--dream-next); }
+.dfast { margin-top: 14px; font-size: 22px; line-height: 1.4; text-align: center; white-space: nowrap; color: var(--dream-next); }
+.dfrow { display: flex; align-items: center; justify-content: center; }
+[dir=rtl] .dfrow svg { margin-left: 10px; }
+[dir=ltr] .dfrow svg { margin-right: 10px; }
+.dsuhoor { margin-top: 6px; color: var(--dream-dim); }
 .drule { width: 80px; height: 1px; margin: 28px 0 18px; background: var(--dream-line); }
 .dnext { margin-top: 10px; font-size: 28px; color: var(--dream-next); white-space: nowrap; }
 .dleft { margin-top: 10px; font-size: 24px; color: var(--dream-dim); }
