@@ -226,7 +226,7 @@
   T.radioDarkRow = function () { return this.ar ? 'إطفاء الشاشة أثناء الاستماع' : 'Screen off while listening'; };
   T.radioDarkHelp = function () {
     return this.d(this.ar ? 'توفير الكهرباء: تنطفئ الشاشة وتستمر الإذاعة · أي زر يعيدها'
-                          : 'Saves power: the screen goes dark, the radio keeps playing · any key brings it back');
+                          : 'Saves power · the radio plays on · any key wakes it');
   };
   T.radioDarkChoices = function () {
     return this.ar ? ['مع شاشة التوقف', 'بعدها بـ 15 د', 'أبدًا'] : ['With screensaver', '15 min later', 'Never'];

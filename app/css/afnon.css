@@ -280,7 +280,7 @@ html.night .appicon img { filter: brightness(0.6) sepia(0.25); }
 [dir=rtl] .fastcard .fwords { margin-right: 24px; }
 [dir=ltr] .fastcard .fwords { margin-left: 24px; }
 .fastcard .title { font-size: 46px; margin-top: 4px; }
-[dir=rtl] .fastcard .title { margin-top: 12px; }
+[dir=rtl] .fastcard .title { margin-top: 20px; line-height: 1.25; }
 [dir=ltr] .fastcard .title { font-size: 40px; }
 .fastcard.quiet .title { font-size: 38px; }
 .fdots { display: flex; margin-top: 10px; }
@@ -426,9 +426,13 @@ html.night .appicon img { filter: brightness(0.6) sepia(0.25); }
 .dline { position: absolute; top: 0; left: 0; }
 .dline path { fill: none; stroke: var(--dream-line); stroke-width: 2; }
 .dcol { position: absolute; top: 190px; left: 20px; width: 400px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+/* With a fast's two lines the column starts higher and the rule is tighter, so the radio row stays in the arch. */
+.dcol.fast { top: 170px; }
+.dcol.fast .drule { margin: 18px 0 12px; }
 .dclock { font-size: 128px; line-height: 1; color: var(--dream-ink); white-space: nowrap; }
 .dclock .m { font-size: 0.35em; }
 .ddate { margin-top: 10px; font-size: 24px; color: var(--dream-dim); }
+.dfast { margin-top: 6px; font-size: 22px; line-height: 1.4; text-align: center; white-space: nowrap; color: var(--dream-next); }
 .drule { width: 80px; height: 1px; margin: 28px 0 18px; background: var(--dream-line); }
 .dnext { margin-top: 10px; font-size: 28px; color: var(--dream-next); white-space: nowrap; }
 .dleft { margin-top: 10px; font-size: 24px; color: var(--dream-dim); }

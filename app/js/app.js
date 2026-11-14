@@ -2832,7 +2832,10 @@
     var c = el('div', 'dcol', g);
     dream.clock = timeEl(c, 'dclock disp num tnum');
     dream.date = el('div', 'ddate', c);
-    dream.fast = el('div', 'ddate gold', c);
+    // The evening before a fast until its Fajr: its name, and suhoor's end under it (one line won't fit the arch).
+    dream.fast = el('div', 'dfast', c);
+    dream.fname = el('div', null, dream.fast);
+    dream.fsuhoor = el('div', null, dream.fast);
     el('div', 'drule', c);
     dream.next = el('div', 'dnext', c);
     dream.left = el('div', 'dleft', c);
@@ -2886,8 +2889,10 @@
       setText(dream.next, names(d)[d.nextIndex] + ' ' + clockText(d.nextTime));
       // The evening before a fast until its Fajr: its name and suhoor's end.
       var fast = fastUpcoming(d, nowMs);
-      setText(dream.fast, fast ? t.fastHome(fast.kind, fast.tomorrow) + t.sep() + t.suhoorEnds(clockText(d.suhoorEnd)) : '');
+      setText(dream.fname, fast ? t.fastHome(fast.kind, fast.tomorrow) : '');
+      setText(dream.fsuhoor, fast ? t.suhoorEnds(clockText(d.suhoorEnd)) : '');
       dream.fast.style.display = fast ? '' : 'none';
+      dream.fast.parentNode.classList.toggle('fast', !!fast);
     }
     var secs = Text.secondsUntil(d.nextTime, nowMs);
     setText(dream.left, t.inMinutes(Math.floor((secs + 59) / 60), Text.duration(secs, false)));
@@ -3364,5 +3369,5 @@
       ' ' + (-new Date().getTimezoneOffset()) + ' min, ' + (clock.useDevice ? 'the TV\'s' : 'the city\'s (' + city.zone + ')') + ' clock');
   }, 3000);
   window.afnon = { key: key, show: show, openCall: openCall, showReminder: showReminder, S: S, radio: Radio, time: Time,
-    showDream: showDream, screenOff: screenOff, drift: drift };
+    showDream: showDream, screenOff: screenOff, drift: drift, showFast: showFast };
 })();
