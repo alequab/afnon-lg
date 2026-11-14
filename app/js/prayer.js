@@ -452,22 +452,91 @@
 
   var hijriFmt;
   /**
-   * The Umm al-Qura month (1–12) of a calendar day (month 0-based; the day may run past the month's end). Where the
-   * engine has no Islamic calendars (Node 8's small ICU), the tabular one, at most a day off.
+   * The Umm al-Qura date of a calendar day (month 0-based; the day may run past the month's end), as Android's ICU
+   * IslamicCalendar gives it: {day, month (0 = Muharram), year}. Where the engine has no Islamic calendars (Node 8's
+   * small ICU), the tabular (Kuwaiti) one, at most a day off.
    */
-  function hijriMonth(y, m, d) {
+  function hijriOf(y, m, d) {
     try {
-      if (hijriFmt === undefined) hijriFmt = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { timeZone: 'UTC', month: 'numeric' });
-      var parts = hijriFmt.formatToParts(new Date(Date.UTC(y, m, d, 12)));
-      for (var i = 0; i < parts.length; i++) if (parts[i].type === 'month') return parseInt(parts[i].value, 10);
+      if (hijriFmt === undefined) hijriFmt = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { timeZone: 'UTC', day: 'numeric', month: 'numeric', year: 'numeric' });
+      if (hijriFmt) {
+        var o = {};
+        hijriFmt.formatToParts(new Date(Date.UTC(y, m, d, 12))).forEach(function (p) { o[p.type] = parseInt(p.value, 10); });
+        if (o.month) return { day: o.day, month: o.month - 1, year: o.year };
+      }
     } catch (e) { hijriFmt = null; }
     var jd = Math.floor(Date.UTC(y, m, d) / 86400000) + 2440588;
     var l = jd - 1948440 + 10632, n = Math.floor((l - 1) / 10631);
     l = l - 10631 * n + 354;
     var j = Math.floor((10985 - l) / 5316) * Math.floor((50 * l) / 17719) + Math.floor(l / 5670) * Math.floor((43 * l) / 15238);
     l = l - Math.floor((30 - j) / 15) * Math.floor((17719 * j) / 50) - Math.floor(j / 16) * Math.floor((15238 * j) / 43) + 29;
-    return Math.floor((24 * l) / 709);
+    var mo = Math.floor((24 * l) / 709);
+    return { day: l - Math.floor((709 * mo) / 24), month: mo - 1, year: 30 * n + j - 30 };
   }
+  /** The Umm al-Qura month, 1–12. */
+  function hijriMonth(y, m, d) {
+    return hijriOf(y, m, d).month + 1;
+  }
+
+  // ---------------------------------------------------------------- voluntary fasts (Afnon's Fasts.java)
+
+  /** Kinds; each but Thursday has its switch bit, and Thursday shares Monday's. */
+  var WHITE_DAYS = 0, DHUL_HIJJAH = 1, ARAFAH = 2, TASUA = 3, ASHURA = 4, SHAWWAL = 5, MONDAY = 6, THURSDAY = 7;
+  var FAST_SWITCHES = 7;
+  /** All on but Monday and Thursday, which would come twice a week. */
+  var FAST_DEFAULT = 63;
+  /** The fast's banner comes this long after Maghrib, so the call and the prayer come first. */
+  var FAST_AFTER_MAGHRIB_MS = 10 * 60000;
+  var MUHARRAM = 0, SHABAN = 7, RAMADAN = 8, SHAWWAL_M = 9, DHU_AL_HIJJAH = 11;
+
+  function on(bits, kind) { return (bits & (1 << kind)) !== 0; }
+  /**
+   * The fast on this Hijri date (month 0-based) and weekday (0 = Sunday) among the switched-on bits; -1 if none. No
+   * reminder for Eid, the Days of Tashriq, Ramadan or the day of doubt.
+   */
+  function fastKind(month, day, weekday, bits) {
+    if (month === RAMADAN) return -1;
+    if (month === SHAWWAL_M && day === 1) return -1;
+    if (month === DHU_AL_HIJJAH && day >= 10 && day <= 13) return -1;
+    if (month === SHABAN && day >= 29) return -1;
+    if (month === DHU_AL_HIJJAH && day === 9 && on(bits, ARAFAH)) return ARAFAH;
+    if (month === MUHARRAM && day === 10 && on(bits, ASHURA)) return ASHURA;
+    // Fasting the 9th with Ashura is the Sunnah, so the Ashura switch brings Tasu'a's evening too.
+    if (month === MUHARRAM && day === 9 && (on(bits, TASUA) || on(bits, ASHURA))) return TASUA;
+    if (month === DHU_AL_HIJJAH && day <= 8 && on(bits, DHUL_HIJJAH)) return DHUL_HIJJAH;
+    // Once, the evening before the first day they can be fasted, not every night of the month.
+    if (month === SHAWWAL_M && day === 2 && on(bits, SHAWWAL)) return SHAWWAL;
+    if (day >= 13 && day <= 15 && on(bits, WHITE_DAYS)) return WHITE_DAYS;
+    if (weekday === 1 && on(bits, MONDAY)) return MONDAY;
+    if (weekday === 4 && on(bits, MONDAY)) return THURSDAY;
+    return -1;
+  }
+  /**
+   * The fast whose evening begins at this Maghrib (a moment): {kind, day, month, year} of the fast's Hijri date, or
+   * null. hijriAdjust is Settings' ±days.
+   */
+  function fastAfter(clock, maghrib, hijriAdjust, bits) {
+    var w = clock.wall(maghrib);
+    var h = hijriOf(w.getUTCFullYear(), w.getUTCMonth(), w.getUTCDate() + 1 + (hijriAdjust | 0));
+    var kind = fastKind(h.month, h.day, (w.getUTCDay() + 1) % 7, bits);
+    return kind < 0 ? null : { kind: kind, day: h.day, month: h.month, year: h.year };
+  }
+  /** Monday and Thursday: a smaller card, with no extra lines. */
+  function fastQuiet(kind) { return kind === MONDAY || kind === THURSDAY; }
+  /** The row of dots under the title: [how many, which is tomorrow (-1 none)], or null. */
+  function fastDots(kind, hijriDay) {
+    switch (kind) {
+      case WHITE_DAYS: return [3, hijriDay - 13];
+      case DHUL_HIJJAH: return [9, hijriDay - 1];
+      case ARAFAH: return [9, 8];
+      case TASUA: return [2, 0];
+      case ASHURA: return [2, 1];
+      case SHAWWAL: return [6, -1];
+      default: return null;
+    }
+  }
+  /** Each kind's [Hijri day, month], for the test hook. */
+  var FAST_SAMPLE = [[13, 6], [3, 11], [9, 11], [9, 0], [10, 0], [2, 9], [20, 1], [23, 1]];
 
   /** Angles for Text.methodAngles: fajr, isha and the Isha interval in minutes (0 when by angle). */
   function angles(method) {
@@ -526,6 +595,10 @@
     METHODS: METHODS, CITIES: CITIES, REGIONS: REGIONS, region: region, ZONES: ZONES, cityById: cityById,
     Clock: Clock, zoneOffset: zoneOffset,
     deviceHasZone: deviceHasZone, deviceZoneName: deviceZoneName, clockFor: clockFor,
-    times: times, timesFor: timesFor, qibla: qibla, angles: angles, isFriday: isFriday
+    times: times, timesFor: timesFor, qibla: qibla, angles: angles, isFriday: isFriday, hijriOf: hijriOf,
+    WHITE_DAYS: WHITE_DAYS, DHUL_HIJJAH: DHUL_HIJJAH, ARAFAH: ARAFAH, TASUA: TASUA, ASHURA: ASHURA,
+    SHAWWAL_FAST: SHAWWAL, MONDAY: MONDAY, THURSDAY: THURSDAY, FAST_SWITCHES: FAST_SWITCHES, FAST_DEFAULT: FAST_DEFAULT,
+    FAST_AFTER_MAGHRIB_MS: FAST_AFTER_MAGHRIB_MS, FAST_SAMPLE: FAST_SAMPLE,
+    fastKind: fastKind, fastAfter: fastAfter, fastQuiet: fastQuiet, fastDots: fastDots
   };
 });

@@ -83,7 +83,11 @@
     // Minutes added to Fajr, Sunrise, Dhuhr, Asr, Maghrib and Isha (Settings → Adjust the times).
     adjust: [0, 0, 0, 0, 0, 0],
     // Minutes before the current prayer's time ends for «أوشك وقت صلاة … على الانتهاء»; 0 is off.
-    endRemind: 15
+    endRemind: 15,
+    // Which voluntary fasts remind the evening before: one bit per switch (Prayer.fastKind).
+    fasts: 63,
+    // The Hijri date ("1448-6-13") whose fast's card was shown, so it shows once.
+    fasted: ''
   };
   var S = loadSettings();
 
@@ -141,24 +145,8 @@
 
   // ---------------------------------------------------------------- the prayer day (PrayerDay.java)
 
-  var hijriFmt = null;
   /** The Umm al-Qura date of a calendar day (month 0-based), as Android's ICU IslamicCalendar gives it. */
-  function hijriOf(y, m, d) {
-    try {
-      if (!hijriFmt) hijriFmt = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', { timeZone: 'UTC', day: 'numeric', month: 'numeric', year: 'numeric' });
-      var o = {};
-      hijriFmt.formatToParts(new Date(Date.UTC(y, m, d, 12))).forEach(function (p) { o[p.type] = parseInt(p.value, 10); });
-      if (o.month) return { day: o.day, month: o.month - 1, year: o.year };
-    } catch (e) { /* below */ }
-    // No Intl calendar: the tabular (Kuwaiti) calendar, at most a day off Umm al-Qura.
-    var jd = Math.floor(Date.UTC(y, m, d) / 86400000) + 2440588;
-    var l = jd - 1948440 + 10632, n = Math.floor((l - 1) / 10631);
-    l = l - 10631 * n + 354;
-    var j = Math.floor((10985 - l) / 5316) * Math.floor((50 * l) / 17719) + Math.floor(l / 5670) * Math.floor((43 * l) / 15238);
-    l = l - Math.floor((30 - j) / 15) * Math.floor((17719 * j) / 50) - Math.floor(j / 16) * Math.floor((15238 * j) / 43) + 29;
-    var mo = Math.floor((24 * l) / 709);
-    return { day: l - Math.floor((709 * mo) / 24), month: mo - 1, year: 30 * n + j - 30 };
-  }
+  var hijriOf = P.hijriOf;
 
   /** One moment's view of the day: the six times, the current and next prayer, Friday, Ramadan, the Qibla. */
   function dayAt(now) {
@@ -727,6 +715,9 @@
     home.date1.style.marginTop = '6px';
     home.date2 = el('div', 'mist', when);
     home.date2.style.cssText = 'margin-top:6px;font-size:24px';
+    home.greg = el('span', null, home.date2);
+    // From a fast's evening until its Fajr, its name in gold after the date, in case its card was missed.
+    home.fastNote = el('span', 'gold', home.date2);
 
     var gear = home.gear = placeEnd(el('div', 't gear', e), 96, 56, 72, 72);
     gear.appendChild(icon('gear', 34, 1.8));
@@ -1239,7 +1230,9 @@
     var day = home.day, a = home.arch, n = names(day);
     setTime(home.clock, now);
     setText(home.date1, hijriText(day) + t.sep() + t.city());
-    setText(home.date2, t.gregorianDate(clock.wall(now)));
+    setText(home.greg, t.gregorianDate(clock.wall(now)));
+    var fast = fastUpcoming(day, now);
+    setText(home.fastNote, fast ? t.sep() + t.fastHome(fast.kind, fast.tomorrow) : '');
     var nextTime = clockText(day.nextTime);
     var label = t.nextPrayer(), name = n[day.nextIndex];
     var sub = t.adhanAt() + ' ' + nextTime + t.sep() + t.city(), sub2 = '';
@@ -1531,6 +1524,80 @@
     home.card = null;
     if (screen === home) focus(home.foot);
   }
+  // ---------------------------------------------------------------- the fasting card (Afnon's TCL build)
+
+  /**
+   * The fast this moment is the evening or the night of: from 10 minutes after Maghrib (the Hijri date has already
+   * turned) until its Fajr. {kind, tomorrow, hijri day/month/year}, or null.
+   */
+  function fastUpcoming(d, nowMs) {
+    var tomorrow;
+    if (nowMs >= d.times[MAGHRIB] + P.FAST_AFTER_MAGHRIB_MS) tomorrow = true;
+    // After midnight, before Fajr (the only time but the evening when Fajr is still ahead): the fast is today.
+    else if (nowMs < d.times[FAJR]) tomorrow = false;
+    else return null;
+    var kind = P.fastKind(d.hijriMonth, d.hijriDay, d.weekday, S.fasts);
+    return kind < 0 ? null : { kind: kind, tomorrow: tomorrow, day: d.hijriDay, month: d.hijriMonth, year: d.hijriYear };
+  }
+
+  var FAST_CARD_MS = 20000, QUIET_CARD_MS = 8000;
+  /**
+   * A voluntary fast tomorrow: its icon, its day among its days as dots, the hadith on its virtue with the source,
+   * and the fast's date with suhoor's end as a pill; at the bottom end like the reminder card, with Got it. Monday
+   * and Thursday are quiet: title and date only, for less time.
+   */
+  function showFast(kind, hijriDay, hijriMonth, suhoor) {
+    if (!home.ready) return;
+    if (home.card) dismissReminder();
+    var quiet = P.fastQuiet(kind);
+    var card = home.card = el('div', 'card fastcard' + (kind === P.ARAFAH ? ' arafah' : '') + (quiet ? ' quiet' : ''), home.el);
+    placeEnd(card, 96, 0);
+    card.style.top = '';
+    card.style.bottom = '56px';
+    var row = el('div', 'frow', card);
+    row.appendChild(icon(['fullmoon', 'kaaba', 'mountain', 'moon', 'moon', 'moon', 'calendar', 'calendar'][kind], quiet ? 52 : 64, 1.6, 'ficon'));
+    var words = el('div', 'fwords', row);
+    el('div', 'lbl caps', words, t.fastLabel());
+    el('div', 'title dispb', words, t.fastTitle(kind, hijriDay));
+    var detail = t.fastDetail(kind, hijriDay);
+    if (detail) el('div', 'sub', words, detail);
+    var dots = P.fastDots(kind, hijriDay);
+    if (dots) {
+      var dr = el('div', 'fdots', words);
+      for (var i = 0; i < dots[0]; i++) el('i', i === dots[1] ? 'on' : null, dr);
+    }
+    var virtue = quiet ? null : t.fastVirtue(kind);
+    if (virtue) {
+      el('div', 'frule', card);
+      el('div', 'fquote', card, virtue);
+      el('div', 'fsrc', card, t.fastSource(kind));
+    }
+    var last = el('div', 'flast', card);
+    el('span', 'fdate', last, t.fastDate(hijriDay, hijriMonth));
+    el('span', 'fpill', last, t.suhoorEnds(clockText(suhoor)));
+    var btns = el('div', 'btns', card);
+    var ok = el('div', 't cbtn fill', btns, t.apOk());
+    ok._ok = dismissReminder;
+    home.cardFor = suhoor;
+    home.cardOk = home.cardDay = ok;
+    home.cardReturn = cur;
+    focus(ok);
+    setHints(home.hints, [t.hintOk(t.apOk()), t.hintBackHome().replace(t.home(), t.dismiss())]);
+    clearTimeout(home.cardTimer);
+    home.cardTimer = setTimeout(function () { if (home.card === card) dismissReminder(); }, quiet ? QUIET_CARD_MS : FAST_CARD_MS);
+  }
+  /** The fast's card, once for its date, when it is due and Home is in front. */
+  function fastTick(nowMs) {
+    if (screen !== home || home.card || dream.on || offv.on || ch.on) return;
+    var d = watch.day, f = fastUpcoming(d, nowMs);
+    if (!f || !f.tomorrow) return;
+    var key = f.year + '-' + f.month + '-' + f.day;
+    if (key === S.fasted) return;
+    S.fasted = key;
+    saveSettings();
+    showFast(f.kind, f.day, f.month, d.suhoorEnd);
+  }
+
   function cardKey(k) {
     if (k === KEY.BACK) return dismissReminder();
     if (k === KEY.OK) return cur && cur._ok && cur._ok();
@@ -1858,6 +1925,21 @@
           openChooser(t.endRemindRow(), digitsOf(t.remindChoices()), idx(REMIND, S.endRemind, 2),
             function (i) { S.endRemind = REMIND[i]; changed(true); });
         } },
+      // The evening before a voluntary fast: one switch for each kind.
+      { kind: VALUE, label: t.fastRow, help: t.fastHelp,
+        value: function () {
+          var n = 0;
+          for (var i = 0; i < P.FAST_SWITCHES; i++) if (S.fasts & (1 << i)) n++;
+          return t.fastValue(n, P.FAST_SWITCHES);
+        },
+        open: function () {
+          var on = [];
+          for (var i = 0; i < P.FAST_SWITCHES; i++) on.push(!!(S.fasts & (1 << i)));
+          openChooser(t.fastRow(), t.fastSwitches(), -1, function (i) {
+            S.fasts = on[i] ? S.fasts | (1 << i) : S.fasts & ~(1 << i);
+            changed(true);
+          }, null, on);
+        } },
       { kind: TOGGLE, label: t.adhanRow, help: t.adhanHelp, on: function () { return S.adhan; },
         set: function (b) { S.adhan = b; changed(true); } },
       { kind: TOGGLE, label: t.announceRow, help: t.announceHelp, on: function () { return S.announce; },
@@ -1975,7 +2057,10 @@
       var g = el('div', null, e);
       g.style.display = 'none';
       set.groups.push(g);
-      set.rows.push(rowsFor(s).map(function (r, k) { return buildRow(g, r, k); }));
+      var rows = rowsFor(s);
+      // Eight rows fit above the hint line 98px apart; a ninth (Reminders) brings them 94px apart.
+      var pitch = rows.length > 8 ? 94 : 98;
+      set.rows.push(rows.map(function (r, k) { return buildRow(g, r, k, pitch); }));
     }
   }
 
@@ -1986,8 +2071,8 @@
     return b;
   }
 
-  function buildRow(g, r, k) {
-    var b = r.el = place(el('div', 't r2 srow', g), 640, 112 + k * 98, 1184, 88);
+  function buildRow(g, r, k, pitch) {
+    var b = r.el = place(el('div', 't r2 srow', g), 640, 112 + k * pitch, 1184, 88);
     var words = el('div', 'words', b);
     r.lb = el('div', 'lb nowrap', words);
     r.hp = el('div', 'hp', words);
@@ -2226,26 +2311,31 @@
 
   /**
    * A list over the screen: OK picks, Back cancels, or opens the list before it when the caller sets ch.back after
-   * this. onFocus, if given, hears each item as focus reaches it.
+   * this. onFocus, if given, hears each item as focus reaches it. Only the focused row is filled; the current choice
+   * is gold words and a check at the end. With switches (one boolean per item), it is a list of switches instead:
+   * OK flips the focused one (pick hears its index) and the list stays open until Back.
    */
-  function openChooser(title, items, selected, pick, onFocus) {
+  function openChooser(title, items, selected, pick, onFocus, switches) {
     if (!ch.scrim) buildChooser();
     ch.pick = pick;
     ch.back = null;
     ch.onFocus = onFocus || null;
     ch.returnTo = cur;
+    ch.switches = switches || null;
     setText(ch.head, title);
     while (ch.items.length < items.length) {
       var it = el('div', 't r0 item', ch.list);
+      it._txt = el('span', 'itxt', it);
+      it.appendChild(icon('check', 30, 2.4, 'ichk'));
       it._focus = (function (x) { return function () { chooserFocused(x); }; })(ch.items.length);
       ch.items.push(it);
     }
     for (var i = 0; i < ch.items.length; i++) {
       var e = ch.items[i];
       if (i < items.length) {
-        setText(e, items[i]);
+        setText(e._txt, items[i]);
         e.style.display = '';
-        e.classList.toggle('chosen', i === selected);
+        e.classList.toggle('chosen', switches ? !!switches[i] : i === selected);
       } else e.style.display = 'none';
     }
     ch.count = items.length;
@@ -2257,7 +2347,8 @@
     ch.box.style.left = '510px';
     ch.scroll = 0;
     ch.list.style.transform = '';
-    setHints(ch.hints, [t.hintMove(), t.hintChoose(), t.hintBackMenu().replace(t.ar ? 'القائمة' : 'Menu', t.cancel())]);
+    setHints(ch.hints, switches ? [t.hintMove(), t.hintToggle(), t.hintDone()]
+      : [t.hintMove(), t.hintChoose(), t.hintBackMenu().replace(t.ar ? 'القائمة' : 'Menu', t.cancel())]);
     ch.on = true;
     ch.scrim.classList.add('on');
     focus(ch.items[Math.max(0, selected)]);
@@ -2297,6 +2388,13 @@
       closeChooser(null);
       if (back) setTimeout(back, 0);
       return;
+    }
+    if (k === KEY.OK && ch.switches) {
+      var i = ch.index;
+      ch.switches[i] = !ch.switches[i];
+      ch.items[i].classList.toggle('chosen', ch.switches[i]);
+      if (ch.pick) ch.pick(i);
+      return showSaved();
     }
     if (k === KEY.OK) return closeChooser(ch.index);
     if (k === KEY.UP && ch.index > 0) focus(ch.items[ch.index - 1]);
@@ -2554,6 +2652,7 @@
       key = r.end.prayer + ':' + r.end.time;
       if (key !== watch.ended) { watch.ended = key; speak('end_', r.end.prayer, d.friday); }
     }
+    fastTick(nowMs);
   }
 
   // ---------------------------------------------------------------- the panel, screen off and the dim screen
@@ -2733,6 +2832,7 @@
     var c = el('div', 'dcol', g);
     dream.clock = timeEl(c, 'dclock disp num tnum');
     dream.date = el('div', 'ddate', c);
+    dream.fast = el('div', 'ddate gold', c);
     el('div', 'drule', c);
     dream.next = el('div', 'dnext', c);
     dream.left = el('div', 'dleft', c);
@@ -2784,6 +2884,10 @@
       setTime(dream.clock, nowMs);
       setText(dream.date, t.d(t.weekdays()[d.weekday] + t.sep() + d.hijriDay + ' ' + t.hijriMonths()[d.hijriMonth]));
       setText(dream.next, names(d)[d.nextIndex] + ' ' + clockText(d.nextTime));
+      // The evening before a fast until its Fajr: its name and suhoor's end.
+      var fast = fastUpcoming(d, nowMs);
+      setText(dream.fast, fast ? t.fastHome(fast.kind, fast.tomorrow) + t.sep() + t.suhoorEnds(clockText(d.suhoorEnd)) : '');
+      dream.fast.style.display = fast ? '' : 'none';
     }
     var secs = Text.secondsUntil(d.nextTime, nowMs);
     setText(dream.left, t.inMinutes(Math.floor((secs + 59) / 60), Text.duration(secs, false)));
@@ -3019,7 +3123,7 @@
         app: APP_ID,
         settings: {
           city: S.city, method: method(), madhab: S.madhab, adjust: S.adjust, bells: S.bells, adhan: S.adhan, remind: S.remind,
-          endRemind: S.endRemind,
+          endRemind: S.endRemind, fasts: S.fasts, hijri: S.hijri | 0,
           remindVoice: S.remindVoice, announce: S.announce, ar: t.ar, eastern: t.eastern, h24: h24
         }
       }, function (r) {
@@ -3088,6 +3192,11 @@
       // Android's test=reminder: Home's own reminder card, now.
       if (screen !== home) show('home');
       showReminder();
+    } else if (kind === 'fast') {
+      // test=fast&fast=0..7 (Prayer's kinds): the fasting card with a sample date of that kind, now.
+      if (screen !== home) show('home');
+      var sample = P.FAST_SAMPLE[(+p.fast | 0) % 8];
+      showFast((+p.fast | 0) % 8, sample[0], sample[1], dayAt(Date.now()).suhoorEnd);
     } else if (kind === 'friday' || kind === 'ramadan' || kind === 'now') shiftTo(kind);
     // at=<ISO time>: Home's clock jumps there (e.g. a winter night in London, for a 12-hour countdown).
     if (p.at && !isNaN(Date.parse(p.at))) {

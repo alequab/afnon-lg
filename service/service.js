@@ -7,8 +7,8 @@
  *   call      at the time, when that prayer's adhan is on: opens Afnon on the call screen (the only thing that
  *             ever brings Afnon to the front);
  *   announce  at the time, when its adhan is off and announcing is on: a toast and "حان الآن موعد صلاة …".
- * The settings come from the page (configure) and travel in the activity's own params, so the chain carries on
  *   end       before the current prayer's time ends: "أوشك وقت صلاة … على الانتهاء".
+ *   fast      after Maghrib, the evening before a voluntary fast: a toast (the page's card on Home).
  * The settings come from the page (configure) and travel in the activity's own params, so the chain carries on
  * without the page. Node 8: CommonJS, async/await, no newer syntax. prayer.js, text.js and adhan.js are the app's
  * own (app/js), copied in when it is packaged. Log: /tmp/afnon-launcher-service.log.
@@ -124,6 +124,9 @@ function settings(s, prev) {
         // Minutes before a prayer's time ends for «أوشك وقت صلاة … على الانتهاء» (the launcher's setting; 0 off).
         endRemind: s.endRemind != null ? Math.max(0, +s.endRemind || 0)
             : prev && prev.endRemind != null ? prev.endRemind : 0,
+        // Which fasts remind the evening before (bits, Prayer.fastKind), and Settings' Hijri adjustment in days.
+        fasts: s.fasts != null ? (+s.fasts | 0) : prev && prev.fasts != null ? prev.fasts : Prayer.FAST_DEFAULT,
+        hijri: s.hijri != null ? (+s.hijri | 0) : prev && prev.hijri != null ? prev.hijri : 0,
         city: s.city || 'cairo', method: s.method || null, madhab: s.madhab === 'hanafi' ? 'hanafi' : 'shafi',
         bells: bells.map(b => (b ? 1 : 0)), adhan: s.adhan !== false, remind: s.remind == null ? 15 : +s.remind,
         remindVoice: s.remindVoice !== false, announce: s.announce !== false,
@@ -157,6 +160,10 @@ function events(s) {
                 out.push({ kind: 'end', prayer: i, time: end, at: end - s.endRemind * 60000 + 10000 });
             }
         }
+        // The evening before a voluntary fast, after Maghrib (20 s past the page's moment, so it is a moment of its
+        // own); its time is the fast's Fajr, when suhoor ends.
+        const fast = Prayer.fastAfter(clock, t[Prayer.MAGHRIB], s.hijri, s.fasts == null ? Prayer.FAST_DEFAULT : s.fasts);
+        if (fast) out.push({ kind: 'fast', prayer: Prayer.MAGHRIB, time: next[Prayer.FAJR], at: t[Prayer.MAGHRIB] + Prayer.FAST_AFTER_MAGHRIB_MS + 20000, fast });
     }
     return out.sort((a, b) => a.at - b.at);
 }
@@ -334,6 +341,12 @@ async function act(ev, s, opts) {
         // Dhuhr's is said, since its time ends at Asr too.
         if (pageInFront) log('end p' + ev.prayer + ': Afnon is in front, it says it');
         else await voice(clipName('end_', ev, false), opts);
+        return;
+    }
+    if (ev.kind === 'fast') {
+        // On Home the page shows its own card, with the hadith; over another app, a toast.
+        if (pageHome) log('fast ' + ev.fast.kind + ': Afnon is on Home, its card shows it');
+        else log('fast ' + ev.fast.kind + ' toast -> ' + JSON.stringify(await toast(t.toastFast(ev.fast.kind, ev.fast.day, at))));
         return;
     }
     if (ev.kind === 'voice') await voice(opts.clip || clipName('before_', ev, p.friday), opts);

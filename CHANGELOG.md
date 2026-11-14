@@ -2,6 +2,23 @@
 
 ## [Unreleased]
 
+### Added
+- **Fasting reminders** (from Afnon's TCL build), Settings → Reminders → «تذكير الصيام», one switch for each: the
+  evening before a voluntary fast, 10 minutes after Maghrib, a card on Home with its icon, its day among its days as
+  dots, the hadith on its virtue and its source, and the fast's date with suhoor's end. Once for each date. The White
+  Days (13, 14, 15), 1 to 8 Dhul-Hijjah, Arafah, Tasu'a (the Ashura switch brings it too), Ashura, the start of Six of
+  Shawwal, and Mondays and Thursdays (off by default; a smaller card, title and date only). Never for Eid, the Days of
+  Tashriq, Ramadan or the day of doubt; the Hijri adjustment counts. Over another app the service shows a toast instead.
+  From the evening until its Fajr the fast's name is in gold after Home's date, and on the dim screen with suhoor's
+  end. Test hook `test=fast&fast=0..7`. The Hijri date is now `Prayer.hijriOf`, shared by the page and the service.
+
+### Fixed
+- Lists show one highlighted row, the focused one: the current choice had a filled row as well, so two rows looked
+  selected. It is now gold words and a check at the end.
+- The method's help says «بزيادة 1 دقيقة», not «1 دقائق» (the methods that add a minute to Dhuhr).
+- Settings → Reminders → Spoken reminder says it plays «حان الآن موعد صلاة …», as it does since the last change.
+- Settings rows fit above the key hints when a section has nine of them (Reminders, with the fasting row).
+
 ### Changed
 - **The name is now Afnon LG** (أفنون LG), as egyjs agreed in afnon-android-tv-launcher#31: the app's title on the TV, the README and the website. This is the Home-screen edition for rooted TVs; the store edition (`tv.afnon.lg`, alequab/afnon-webos) has the same name. The app id and the repository stay as they are, so updates keep coming.
 - On Friday the spoken lines use Dhuhr's recordings («حان الآن موعد صلاة الظهر» in Lutfi Khamis's voice) instead

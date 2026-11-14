@@ -273,6 +273,30 @@ html.night .appicon img { filter: brightness(0.6) sepia(0.25); }
 .card .title { font-size: 52px; line-height: 1.15; }
 .card .sub { font-size: 24px; color: var(--card-sub); margin-top: 6px; }
 .card .btns { margin-top: 24px; height: 68px; }
+/* The fasting card: icon and words in a row, the day among its days as dots, the hadith, then the date and suhoor. */
+.fastcard .frow { display: flex; align-items: center; }
+.fastcard .ficon { flex: none; color: var(--card-fg); }
+.fastcard .fwords { flex: 1; min-width: 0; }
+[dir=rtl] .fastcard .fwords { margin-right: 24px; }
+[dir=ltr] .fastcard .fwords { margin-left: 24px; }
+.fastcard .title { font-size: 46px; margin-top: 4px; }
+[dir=rtl] .fastcard .title { margin-top: 12px; }
+[dir=ltr] .fastcard .title { font-size: 40px; }
+.fastcard.quiet .title { font-size: 38px; }
+.fdots { display: flex; margin-top: 10px; }
+.fdots i { display: block; width: 12px; height: 12px; border-radius: 6px; box-sizing: border-box; border: 2px solid var(--card-btn-line); }
+.fdots i.on { background: var(--card-fg); border-color: var(--card-fg); }
+[dir=rtl] .fdots i + i { margin-right: 8px; }
+[dir=ltr] .fdots i + i { margin-left: 8px; }
+.frule { height: 1px; background: var(--card-btn-line); margin-top: 20px; }
+.fquote { margin-top: 14px; font-size: 22px; line-height: 1.5; }
+[dir=rtl] .fquote { font-family: Amiri, serif; font-size: 30px; }
+.fsrc { margin-top: 4px; font-size: 20px; color: var(--card-sub); }
+.flast { display: flex; align-items: center; margin-top: 16px; font-size: 22px; }
+.flast .fdate { flex: 1; color: var(--card-sub); }
+.flast .fpill { padding: 6px 18px; border-radius: 999px; border: 2px solid var(--card-btn-line); }
+/* Arafah, the day of the year, has the gold border. */
+.fastcard.arafah { border-color: var(--gold); }
 .cbtn { position: relative; display: inline-flex; align-items: center; height: 68px; box-sizing: border-box; padding: 0 32px; border-radius: 34px; font-size: 24px; vertical-align: top; }
 .cbtn::after { border-radius: 44px; }
 .cbtn.fill { background: var(--lapis9); color: var(--ink); }
@@ -383,7 +407,11 @@ html.night .appicon img { filter: brightness(0.6) sepia(0.25); }
 /* The ring sits in the 6px gap, and the focused item above its neighbours, so a chosen item below never covers it. */
 .item::after { border-radius: 20px; top: -5px; left: -5px; right: -5px; bottom: -5px; }
 .item.f { z-index: 1; }
-.item.chosen { background: var(--lapis7); color: var(--gold); font-weight: 500; }
+/* Only focus fills a row; the current choice is gold words and a check at the end. */
+.item .itxt { flex: 1; min-width: 0; }
+.item .ichk { flex: none; display: none; }
+.item.chosen { color: var(--gold); font-weight: 500; }
+.item.chosen .ichk { display: block; }
 
 /* ---------------------------------------------------------------- screen off and the dim screen */
 .veil { position: absolute; top: 0; left: 0; width: 1920px; height: 1080px; background: #000; display: none; overflow: hidden; }
