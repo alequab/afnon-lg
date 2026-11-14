@@ -123,7 +123,7 @@ clock() {
 # ---------------------------------------------------------------- sounds and updates
 
 KEEP=/var/lib/afnon-launcher
-REPO=alequab/islamic-launcher-for-lg-tv
+REPO=alequab/afnon-lg
 mkdir -p $KEEP
 
 # The adhans and spoken lines live in the app's folder, which an install replaces: a copy is kept aside (when the

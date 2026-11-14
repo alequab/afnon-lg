@@ -29,7 +29,7 @@
 نسخة الشاشة الرئيسية من أفنون LG، لتلفازات LG بعد الروت. (نسخة متجر LG التي لا تحتاج روتًا في
 [alequab/afnon-webos](https://github.com/alequab/afnon-webos)، ولا تُثبَّت النسختان معًا.)
 
-**[جرّبه في المتصفح](https://alequab.github.io/islamic-launcher-for-lg-tv/)** · **[أحدث إصدار](https://github.com/alequab/islamic-launcher-for-lg-tv/releases/latest)** · [التثبيت](#install-ar)
+**[جرّبه في المتصفح](https://alequab.github.io/afnon-lg/)** · **[أحدث إصدار](https://github.com/alequab/afnon-lg/releases/latest)** · [التثبيت](#install-ar)
 
 مبني على أفنون، ويجعله الشاشةَ الرئيسية لتلفاز LG: يفتح وحده عند تشغيل التلفاز قبل أي مدخل HDMI، وفيه الصلاة
 القادمة والعدّ التنازلي في المحراب، ومواقيت اليوم، والأذان في وقته، وإذاعات القرآن الكريم، والبث المباشر من الحرمين،
@@ -41,7 +41,7 @@
 > [egyjs/afnon-android-tv-launcher](https://github.com/egyjs/afnon-android-tv-launcher). التصميم والمزايا منه،
 > وهذا المستودع ينقلها إلى تلفازات LG بالرخصة نفسها (MIT). شكرًا لـ egyjs.
 > يتولّى [alequab](https://github.com/alequab) صيانة هذا النقل، فأبلغ عن مشكلات تلفاز LG
-> [هنا](https://github.com/alequab/islamic-launcher-for-lg-tv/issues) لا في مستودع أفنون.
+> [هنا](https://github.com/alequab/afnon-lg/issues) لا في مستودع أفنون.
 
 يعمل على تلفازات LG بنظام webOS 5 فأحدث، **بعد الروت** ([Homebrew Channel](https://github.com/webosbrew/webos-homebrew-channel)،
 والروت بأداة [SlopBro](https://github.com/throwaway96/slopbro))، ولا يحتاج أي تطبيق آخر.
@@ -100,7 +100,7 @@
    ينزّل التلفاز الحزمة من حاسوبك، وقد يسألك ويندوز مرة واحدة أن تسمح لـ Node بالمرور من جدار الحماية.
 5. أطفئ التلفاز وشغّله: يفتح المشغّل أولًا.
 
-**بعد ذلك** يتحدّث التلفاز وحده من [إصدارات هذا المستودع](https://github.com/alequab/islamic-launcher-for-lg-tv/releases)
+**بعد ذلك** يتحدّث التلفاز وحده من [إصدارات هذا المستودع](https://github.com/alequab/afnon-lg/releases)
 مرة في اليوم، ولا حاجة إلى الحاسوب.
 
 **إن كان عندك نسخة المتجر من أفنون LG** (`tv.afnon.lg`) فاحذفها بعد التثبيت، وإلا رُفع الأذان مرتين.
@@ -121,7 +121,7 @@
 The Home-screen edition of Afnon LG, for rooted LG TVs. (The LG Content Store edition, no root needed, is
 [alequab/afnon-webos](https://github.com/alequab/afnon-webos); don't install both.)
 
-**[Try it in your browser](https://alequab.github.io/islamic-launcher-for-lg-tv/)** · **[Latest release](https://github.com/alequab/islamic-launcher-for-lg-tv/releases/latest)** · [Install](#install)
+**[Try it in your browser](https://alequab.github.io/afnon-lg/)** · **[Latest release](https://github.com/alequab/afnon-lg/releases/latest)** · [Install](#install)
 
 Built on Afnon: Afnon as the Home screen of an LG TV. It opens by itself when the TV turns on, before any HDMI
 input, with the next prayer and its countdown in a mihrab arch, today's times, the adhan at prayer time, Quran
@@ -131,7 +131,7 @@ radio and live Makkah and Madinah, then your favourite apps, more apps and All a
 > [egyjs/afnon-android-tv-launcher](https://github.com/egyjs/afnon-android-tv-launcher). The design and the
 > features come from egyjs's Afnon; this repository brings them to LG TVs under the same MIT licence.
 > This port is maintained by [alequab](https://github.com/alequab): please report LG problems
-> [here](https://github.com/alequab/islamic-launcher-for-lg-tv/issues), not in Afnon's repository.
+> [here](https://github.com/alequab/afnon-lg/issues), not in Afnon's repository.
 
 Works on LG TVs with webOS 5 or newer, **rooted** with [Homebrew Channel](https://github.com/webosbrew/webos-homebrew-channel)
 (see [Rooting](#rooting)). One app, nothing else to install.
