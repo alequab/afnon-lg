@@ -1,6 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [1.3.5] - 2026-11-18
+
+### Changed
+- Settings → What's new has 1.3.5.
 
 ### Fixed
 - The screensaver fix still failed after an update: LG keeps a closed launcher's registration for a while and

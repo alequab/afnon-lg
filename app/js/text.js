@@ -330,6 +330,8 @@
    */
   T.news = function () {
     if (this.ar) return [
+      ['1.3.5',
+        'شاشة التوقف من LG تبقى بعيدة بعد كل تحديث، لا بعد إعادة التشغيل فقط'],
       ['1.3.4',
         'إبعاد شاشة التوقف من LG يعمل من أول تشغيل بعد التحديث التلقائي'],
       ['1.3.3',
@@ -366,6 +368,8 @@
         'هذه الصفحة: ما الجديد في كل إصدار']
     ];
     return [
+      ['1.3.5',
+        "LG's screensaver stays away after every update, not only after a restart"],
       ['1.3.4',
         "Keeping LG's screensaver away works from the first start after the automatic update"],
       ['1.3.3',
