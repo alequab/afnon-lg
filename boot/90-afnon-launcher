@@ -23,7 +23,8 @@
 
 APP=tv.afnon.launcher
 PERM=/var/luna-service2-dev/client-permissions.d/$APP.app.json
-WANT='{"tv.afnon.launcher-*":["public","applications","applications.internal","applications.launch","applications.query","networking.query","tv.afnon.launcher.service.group"]}'
+# tv.management: LG asks it before its own screensaver, and the launcher says no and shows its dim screen.
+WANT='{"tv.afnon.launcher-*":["public","applications","applications.internal","applications.launch","applications.query","networking.query","tv.management","tv.afnon.launcher.service.group"]}'
 LOG=/tmp/afnon-launcher.log
 PID=/tmp/afnon-launcher.pid
 

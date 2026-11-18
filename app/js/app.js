@@ -2826,9 +2826,9 @@
   }
 
   /**
-   * The dim screen (AfnonDream), in Afnon itself since LG keeps its own screensaver: after IDLE_MS without a key
-   * while the radio plays, black with a dim arch outline, the clock, the date and the next prayer. The group moves
-   * every 60 s with an 800 ms fade. After Settings → Radio → Screen off while listening (at once by default) the
+   * The dim screen (AfnonDream), in Afnon itself: after IDLE_MS without a key while the radio plays, and in place
+   * of LG's own screensaver whenever the TV is about to show it over Afnon (declined below): black with a dim
+   * arch outline, the clock, the date and the next prayer. The group moves every 60 s with an 800 ms fade. After Settings → Radio → Screen off while listening (at once by default) the
    * panel goes off too. Any key comes back.
    */
   var IDLE_MS = 5 * 60000, DRIFT_MS = 60000, FADE_MS = 800, DREAM_W = 440, DREAM_H = 640;
@@ -2869,6 +2869,7 @@
     dream.start = dream.lastDrift = Date.now();
     dream.minute = -1;
     dream.dark = false;
+    dream.lg = false;
     dream.group.style.visibility = '';
     dream.group.style.opacity = '';
     // The design's own spot first; drifting starts a minute later.
@@ -2929,8 +2930,8 @@
     if (!due && realMs - dream.lastDrift >= DRIFT_MS) drift();
   }
 
-  // Radio off ends both (ScreenOffActivity finishes; on LG the dim screen is the radio's).
-  Radio.listeners.push(function () { if (!Radio.wanted && (offv.on || dream.on)) wake(); });
+  // Radio off ends the black screen (ScreenOffActivity finishes), and the dim screen it brought.
+  Radio.listeners.push(function () { if (!Radio.wanted && (offv.on || dream.on && !dream.lg)) wake(); });
 
   // ---------------------------------------------------------------- the clock
 
@@ -2941,11 +2942,11 @@
    * says so instead of times and nothing is called or spoken; the moment it is set, or jumps, everything is
    * worked out again and the service is told, so it reschedules the adhan.
    */
-  var Time = { valid: true, lastTick: 0 };
+  var Time = { valid: true, lastTick: 0, bridges: [] };
   function lunaSubscribe(uri, params, cb) {
     if (!TV) return;
     var b = new PalmServiceBridge();
-    Time.bridge = b;   // kept, or the subscription would end with it
+    Time.bridges.push(b);   // kept, or the subscription would end with it
     b.onservicecallback = function (m) { try { cb(JSON.parse(m)); } catch (e) { /* not JSON */ } };
     b.call(uri, JSON.stringify(params));
   }
@@ -2967,6 +2968,23 @@
     if (Time.valid) configureService(500);
     tick(true);
   }
+
+  /**
+   * LG's own screensaver: the TV asks its listeners first (registerScreenSaverRequest, group tv.management) and
+   * takes "no" within a few seconds, or shows it. While Afnon is in front the answer is no and the dim screen comes
+   * instead, radio or not; behind another app LG's comes as before. Seen on the TV 2026-11-18: no answer in time
+   * and LG's screensaver came over Home.
+   */
+  lunaSubscribe('luna://com.webos.service.tvpower/power/registerScreenSaverRequest',
+    { subscribe: true, clientName: APP_ID }, function (r) {
+      if (!r.timestamp) return;
+      var mine = !document.hidden;
+      luna('luna://com.webos.service.tvpower/power/responseScreenSaverRequest',
+        { clientName: APP_ID, ack: !mine, timestamp: r.timestamp });
+      if (!mine) return;
+      note('LG screensaver declined');
+      if (!dream.on && !offv.on && screen !== now) { showDream(); dream.lg = true; }
+    });
 
   var tickTimer = 0, toldMinute = -1;
   function tick(force) {

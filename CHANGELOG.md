@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- LG's own screensaver came over Afnon after a while without a key. Afnon now says no to it while it is in front
+  and shows its own dim screen instead, with or without the radio (the boot script gives the launcher the
+  `tv.management` group this needs). Behind another app, LG's screensaver comes as before.
+
 ## [1.3.2] - 2026-11-14
 
 ### Changed
