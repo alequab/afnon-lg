@@ -1,6 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [1.3.3] - 2026-11-18
+
+### Changed
+- Settings → What's new has 1.3.3.
 
 ### Fixed
 - LG's own screensaver came over Afnon after a while without a key. Afnon now says no to it while it is in front

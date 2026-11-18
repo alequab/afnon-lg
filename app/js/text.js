@@ -330,6 +330,8 @@
    */
   T.news = function () {
     if (this.ar) return [
+      ['1.3.3',
+        'شاشة التوقف من LG لا تظهر فوق أفنون: تظهر الشاشة الخافتة بدلها، مع الراديو أو بدونه'],
       ['1.3.2',
         'مؤشر الريموت لا ينقل التحديد خارج بطاقة التذكير أو الصيام، فلا يفتح OK تطبيقًا آخر'],
       ['1.3.1',
@@ -362,6 +364,8 @@
         'هذه الصفحة: ما الجديد في كل إصدار']
     ];
     return [
+      ['1.3.3',
+        "LG's screensaver no longer comes over Afnon: the dim screen shows instead, with or without the radio"],
       ['1.3.2',
         "The remote's pointer no longer moves the focus off the reminder or fasting card, so OK doesn't open another app"],
       ['1.3.1',
