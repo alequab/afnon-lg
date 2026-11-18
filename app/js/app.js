@@ -2973,15 +2973,17 @@
    * LG's own screensaver: the TV asks its listeners first (registerScreenSaverRequest, group tv.management) and
    * takes "no" within a few seconds, or shows it. While Afnon is in front the answer is no and the dim screen comes
    * instead, radio or not; behind another app LG's comes as before. Seen on the TV 2026-11-18: no answer in time
-   * and LG's screensaver came over Home. Refused (seen once, at the first start after an update, while the TV
-   * was still taking in the new permissions): logged and asked again 30 s later.
+   * and LG's screensaver came over Home. Each start registers under its own name: the page closed by an update
+   * stays registered for a while, and LG refused the same name again («The client is already registered»,
+   * 2026-11-18). Any other refusal is logged and asked again 30 s later.
    */
   function screensaverWatch(tries) {
+    var name = APP_ID + '.' + Date.now();
     lunaSubscribe('luna://com.webos.service.tvpower/power/registerScreenSaverRequest',
-      { subscribe: true, clientName: APP_ID }, function (r) { screensaverAsked(r, tries); });
+      { subscribe: true, clientName: name }, function (r) { screensaverAsked(r, tries, name); });
   }
   screensaverWatch(0);
-  function screensaverAsked(r, tries) {
+  function screensaverAsked(r, tries, name) {
     if (r.returnValue === false) {
       note('LG screensaver watch refused: ' + (r.errorText || r.errorCode));
       if (tries < 20) setTimeout(function () { screensaverWatch(tries + 1); }, 30000);
@@ -2991,7 +2993,7 @@
     if (!r.timestamp) return;
     var mine = !document.hidden;
     luna('luna://com.webos.service.tvpower/power/responseScreenSaverRequest',
-      { clientName: APP_ID, ack: !mine, timestamp: r.timestamp });
+      { clientName: name, ack: !mine, timestamp: r.timestamp });
     if (!mine) return;
     note('LG screensaver declined');
     if (!dream.on && !offv.on && screen !== now) { showDream(); dream.lg = true; }

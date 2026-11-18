@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- The screensaver fix still failed after an update: LG keeps a closed launcher's registration for a while and
+  refused the new one under the same name («The client is already registered»). Each start now registers under
+  its own name.
+
 ## [1.3.4] - 2026-11-18
 
 ### Changed
