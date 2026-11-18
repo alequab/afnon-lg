@@ -2973,18 +2973,29 @@
    * LG's own screensaver: the TV asks its listeners first (registerScreenSaverRequest, group tv.management) and
    * takes "no" within a few seconds, or shows it. While Afnon is in front the answer is no and the dim screen comes
    * instead, radio or not; behind another app LG's comes as before. Seen on the TV 2026-11-18: no answer in time
-   * and LG's screensaver came over Home.
+   * and LG's screensaver came over Home. Refused (seen once, at the first start after an update, while the TV
+   * was still taking in the new permissions): logged and asked again 30 s later.
    */
-  lunaSubscribe('luna://com.webos.service.tvpower/power/registerScreenSaverRequest',
-    { subscribe: true, clientName: APP_ID }, function (r) {
-      if (!r.timestamp) return;
-      var mine = !document.hidden;
-      luna('luna://com.webos.service.tvpower/power/responseScreenSaverRequest',
-        { clientName: APP_ID, ack: !mine, timestamp: r.timestamp });
-      if (!mine) return;
-      note('LG screensaver declined');
-      if (!dream.on && !offv.on && screen !== now) { showDream(); dream.lg = true; }
-    });
+  function screensaverWatch(tries) {
+    lunaSubscribe('luna://com.webos.service.tvpower/power/registerScreenSaverRequest',
+      { subscribe: true, clientName: APP_ID }, function (r) { screensaverAsked(r, tries); });
+  }
+  screensaverWatch(0);
+  function screensaverAsked(r, tries) {
+    if (r.returnValue === false) {
+      note('LG screensaver watch refused: ' + (r.errorText || r.errorCode));
+      if (tries < 20) setTimeout(function () { screensaverWatch(tries + 1); }, 30000);
+      return;
+    }
+    if (r.subscribed) note('LG screensaver watch on');
+    if (!r.timestamp) return;
+    var mine = !document.hidden;
+    luna('luna://com.webos.service.tvpower/power/responseScreenSaverRequest',
+      { clientName: APP_ID, ack: !mine, timestamp: r.timestamp });
+    if (!mine) return;
+    note('LG screensaver declined');
+    if (!dream.on && !offv.on && screen !== now) { showDream(); dream.lg = true; }
+  }
 
   var tickTimer = 0, toldMinute = -1;
   function tick(force) {

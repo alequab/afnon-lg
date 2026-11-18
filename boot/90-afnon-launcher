@@ -181,6 +181,13 @@ update() {
   if grep -q '"installed"' $ilog; then log "update: installed ${tag#v}"; else log "update: install failed"; fi
   rm -f $ipk $ilog
   perms; icons; sounds
+  # The launcher the TV reopened during the install started before the permissions were back, and LG refused
+  # it the screensaver watch (2026-11-18, 1.3.3): opened again with them.
+  if [ "$(front)" = "$APP" ]; then
+    luna-send -n 1 luna://com.webos.applicationManager/closeByAppId "{\"id\":\"$APP\"}" >/dev/null 2>&1
+    sleep 2
+    luna-send -n 1 luna://com.webos.applicationManager/launch "{\"id\":\"$APP\"}" >/dev/null 2>&1
+  fi
   # This script from the same release, for the next boot (the watcher running now carries on as it is).
   new=/tmp/afnon-launcher-boot
   if curl -s -m 30 -L -o $new "https://raw.githubusercontent.com/$REPO/$tag/boot/90-afnon-launcher" &&

@@ -1,5 +1,12 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- 1.3.3's screensaver fix didn't take at the first start after the self-update: the TV reopened the launcher
+  before its permissions were back, and LG refused it. The update now opens the launcher again after setting them,
+  and the launcher asks LG again 30 s later if refused (logged).
+
 ## [1.3.3] - 2026-11-18
 
 ### Changed
