@@ -330,6 +330,8 @@
    */
   T.news = function () {
     if (this.ar) return [
+      ['1.3.4',
+        'إبعاد شاشة التوقف من LG يعمل من أول تشغيل بعد التحديث التلقائي'],
       ['1.3.3',
         'شاشة التوقف من LG لا تظهر فوق أفنون: تظهر الشاشة الخافتة بدلها، مع الراديو أو بدونه'],
       ['1.3.2',
@@ -364,6 +366,8 @@
         'هذه الصفحة: ما الجديد في كل إصدار']
     ];
     return [
+      ['1.3.4',
+        "Keeping LG's screensaver away works from the first start after the automatic update"],
       ['1.3.3',
         "LG's screensaver no longer comes over Afnon: the dim screen shows instead, with or without the radio"],
       ['1.3.2',

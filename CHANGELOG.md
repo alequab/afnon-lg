@@ -1,6 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [1.3.4] - 2026-11-18
+
+### Changed
+- Settings → What's new has 1.3.4.
 
 ### Fixed
 - 1.3.3's screensaver fix didn't take at the first start after the self-update: the TV reopened the launcher
