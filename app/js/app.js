@@ -721,13 +721,14 @@
     // Under the clock the Hijri date (with the city) first, then the Gregorian, smaller and in mist.
     home.date1 = el('div', null, when);
     home.date1.style.marginTop = '6px';
-    home.date2 = el('div', 'mist', when);
-    home.date2.style.cssText = 'margin-top:6px;font-size:24px';
+    home.date2 = el('div', 'mist gline', when);
+    home.date2.style.cssText = 'margin-top:6px;font-size:24px;min-height:48px';
     home.greg = el('span', null, home.date2);
-    // From a fast's first card until its Fajr, a chip under the dates («غدًا الاثنين: ثاني الأيام البيض»), gold
-    // until opened; OK shows the card again (Afnon's Home chip). Up from the favourites, Down from the header.
-    var chip = home.fastChip = el('div', 't fchip', when);
-    home.fastChipIcon = chip.appendChild(icon('moon', 24, 1.8));
+    // From a fast's first card until its Fajr, a chip on the Gregorian date's line («غدًا الاثنين: ثاني الأيام
+    // البيض»), gold until opened; OK shows the card again (Afnon's Home chip, DESIGN.md's Courtyard Order Rule). Up
+    // from the favourites, Down from the header.
+    var chip = home.fastChip = el('div', 't fchip', home.date2);
+    home.fastChipIcon = chip.appendChild(icon('moon', 28, 1.8));
     home.fastChipText = el('span', null, chip);
     chip.style.display = 'none';
     chip._ok = function () {

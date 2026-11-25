@@ -142,6 +142,8 @@ svg { display: block; overflow: visible; }
 .cell .tag { flex: 1; font-size: 20px; }
 .cell .nm { font-size: 26px; line-height: 1.1; white-space: nowrap; }
 .cell .tm { font-size: 34px; line-height: 1.1; white-space: nowrap; }
+/* ص/م at 20px: nothing under the 20px floor (DESIGN.md). */
+.cell .tm .m { font-size: 20px; }
 [lang=en].h12 .cell .tm { font-size: 30px; }
 .cell.past { background: var(--past); color: var(--mist); }
 .cell.next { background: transparent; color: var(--gold); border: 3px solid var(--gold); padding: 13px 17px; }
@@ -464,9 +466,13 @@ html.night .appicon img { filter: brightness(0.6) sepia(0.25); }
 .callbtn.b { border: 2px solid var(--line); margin-top: 18px; }
 #now .hint { font-size: 22px; color: var(--mist); margin-top: 20px; }
 
-/* Home's fasting chip under the dates (Afnon's Home chip): gold outline and words until it is opened. */
-.fchip { position: relative; align-self: flex-start; display: inline-flex; align-items: center; height: 44px; margin-top: 6px; padding: 0 18px; border-radius: 22px; border: 2px solid var(--line); font-size: 22px; color: var(--ink); white-space: nowrap; }
-.fchip::after { border-radius: 28px; }
+/* Home's fasting chip on the Gregorian date's line (DESIGN.md's chip): lapis fill, a soft outline and plaster words;
+   unread, a 3px gold outline and gold words until it is opened. Never a gold fill at rest: that is focus. */
+#home .gline { white-space: nowrap; }
+.fchip { position: relative; display: inline-flex; vertical-align: middle; align-items: center; height: 48px; padding: 0 26px 0 22px; border-radius: 24px; border: 2px solid var(--line); background: var(--lapis8); font-size: 24px; color: var(--ink); white-space: nowrap; }
+[dir=rtl] .fchip { margin-right: 28px; padding: 0 22px 0 26px; }
+[dir=ltr] .fchip { margin-left: 28px; }
+.fchip::after { border-radius: 30px; }
 [dir=rtl] .fchip svg { margin-left: 10px; }
 [dir=ltr] .fchip svg { margin-right: 10px; }
-.fchip.unread { border-color: var(--gold); color: var(--gold); }
+.fchip.unread { border: 3px solid var(--gold); color: var(--gold); }
