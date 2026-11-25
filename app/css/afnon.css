@@ -37,15 +37,17 @@
  */
 html.night {
   --lapis9: #0B0A08; --lapis8: #17140F; --lapis7: #221D16; --side: #090806; --callbg: #070605;
-  /* Mist #847E73: 4.9:1 on the night ground (was #6A655C, 3.4:1), as Afnon's night tokens. */
-  --gold: #84703F; --gold2: #93835C; --ink: #8F877A; --mist: #847E73;
+  /* Mist #8C8679: 4.6:1 even on the radio card's raised lapis (#221D16); Afnon's #847E73 (4.9:1 on the ground,
+     was #6A655C, 3.4:1) fell to 4.15:1 there. */
+  --gold: #84703F; --gold2: #93835C; --ink: #8F877A; --mist: #8C8679;
   --line: rgba(143,135,122,0.22); --line-faint: rgba(143,135,122,0.1); --line-mid: rgba(143,135,122,0.45);
   --gold60: rgba(132,112,63,0.6); --gold45: rgba(132,112,63,0.45); --past: rgba(23,20,15,0.6);
   --scrim: rgba(11,10,8,0.94); --seg-focus: rgba(11,10,8,0.3); --bell-off: rgba(106,101,92,0.4);
   --focus-bg: #3A3022; --focus-fg: #CDB68A; --ring: #A8987A;
   --now-bg: #2A241B; --now-fg: #B0A27F;
   --card-bg: #221D16; --card-fg: #A99C80; --card-line: rgba(132,112,63,0.5); --card-btn-line: rgba(143,135,122,0.35);
-  --card-lbl: #84703F; --card-sub: #6A655C;
+  /* The card's label and secondary words at 4.6-4.8:1 on its #221D16 (were 3.5 and 2.9:1). */
+  --card-lbl: #9B8752; --card-sub: #8C8679;
   --dream-ink: #6A655C; --dream-dim: #4F4B44; --dream-next: #75684A; --dream-line: rgba(132,112,63,0.28);
   --lattice: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cg fill='none' stroke='rgba(132,112,63,0.06)' stroke-width='1.5'%3E%3Crect x='28' y='28' width='40' height='40'/%3E%3Crect x='28' y='28' width='40' height='40' transform='rotate(45 48 48)'/%3E%3Cpath d='M0 48H20M76 48H96M48 0V20M48 76V96'/%3E%3C/g%3E%3C/svg%3E");
 }
@@ -144,6 +146,9 @@ svg { display: block; overflow: visible; }
 .cell .tm { font-size: 34px; line-height: 1.1; white-space: nowrap; }
 /* ص/م at 20px: nothing under the 20px floor (DESIGN.md). */
 .cell .tm .m { font-size: 20px; }
+/* Night gold (#84703F) is 3.8-4.1:1, enough for large text only: the small gold words take the night Dawn Gold
+   (#93835C, 4.9-5.3:1). */
+html.night .cell.next .tag, html.night .cell.next .tm .m, html.night .preview .m { color: var(--gold2); }
 [lang=en].h12 .cell .tm { font-size: 30px; }
 .cell.past { background: var(--past); color: var(--mist); }
 .cell.next { background: transparent; color: var(--gold); border: 3px solid var(--gold); padding: 13px 17px; }
@@ -210,9 +215,9 @@ svg { display: block; overflow: visible; }
 /* An app's icon: the TV's picture, or its first letter on a tile. Night mode: dimmer and a little warm. */
 .appicon { flex: none; display: flex; align-items: center; justify-content: center; }
 .appicon img { width: 100%; height: 100%; object-fit: contain; }
-.appicon.mono { border-radius: 12px; background: var(--lapis7); color: var(--gold); font-weight: 600; font-size: 0.6em; }
+.appicon.mono { border-radius: 12px; background: var(--lapis7); color: var(--ink); font-weight: 600; font-size: 0.6em; }
 .favtile .appicon.mono { font-size: 26px; }
-.moretile .appicon.mono, .alltile .appicon.mono { font-size: 18px; border-radius: 8px; }
+.moretile .appicon.mono, .alltile .appicon.mono { font-size: 20px; border-radius: 8px; }
 .t.f .appicon.mono { background: var(--lapis9); }
 html.night .appicon img { filter: brightness(0.6) sepia(0.25); }
 
@@ -402,6 +407,7 @@ html.night .appicon img { filter: brightness(0.6) sepia(0.25); }
 .news .nhead ~ .nhead { margin-top: 28px; }
 .news .nline { font-size: 24px; line-height: 1.4; margin-top: 10px; }
 .preview { box-sizing: border-box; width: 424px; height: 124px; padding: 20px 24px; border-radius: 16px; background: var(--lapis8); }
+.preview .m { font-size: 20px; }
 
 /* The list chooser. */
 .chooser { width: 900px; padding: 40px 48px 32px; }
