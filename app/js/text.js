@@ -365,6 +365,12 @@
    */
   T.news = function () {
     if (this.ar) return [
+      ['1.4.0',
+        'تذكير الصيام بعد كل صلاة قبل الصيام، والاثنين والخميس مفعّلان من البداية',
+        'زر الصيام تحت التاريخ في الرئيسية يعيد عرض التذكير',
+        'إذا وافق الصيام يوم الاثنين أو الخميس: «فاجمع فيه بين النيتين»',
+        'عدّ تنازلي أهدأ بالساعات والدقائق، و«الأذان متوقف» إذا أوقفته',
+        'الشاشة الخافتة أكبر، وحظر خوادم إعلانات LG لبلد التلفاز'],
       ['1.3.5',
         'شاشة التوقف من LG تبقى بعيدة بعد كل تحديث، لا بعد إعادة التشغيل فقط'],
       ['1.3.4',
@@ -403,6 +409,12 @@
         'هذه الصفحة: ما الجديد في كل إصدار']
     ];
     return [
+      ['1.4.0',
+        "Fasting reminders after each prayer before the fast; Mondays and Thursdays on from the start",
+        "A fasting chip under Home's date shows the reminder again",
+        "A fast on a Monday or Thursday: one fast, both intentions",
+        "A calmer countdown in hours and minutes, and “Adhan off” when it is off",
+        "A larger dim screen, and LG's ad servers for the TV's country blocked"],
       ['1.3.5',
         "LG's screensaver stays away after every update, not only after a restart"],
       ['1.3.4',

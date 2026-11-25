@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [1.4.0] - 2026-11-25
 
 From Afnon's TCL build (alequab's fork, `tcl-features` 2f76799, 1818031, 759c683, 5b5a95e) and cleanyourtv-WebOS #286.
 
@@ -24,6 +24,10 @@ From Afnon's TCL build (alequab's fork, `tcl-features` 2f76799, 1818031, 759c683
 - The clean-up also blocks the ad servers of the TV's own LG services country (`<cc>.ad.lgsmartad.com`,
   `<cc>.info.lgsmartad.com`), as cleanyourtv-WebOS does, so LG's ad manager is refused at once.
 - Test hook `test=fast&fast=N` takes `&both`, `&short` and `&pinned`.
+- From a design review against Afnon's DESIGN.md: the fasting chip is 48px with a lapis fill, 24px words and a
+  3px gold outline until opened, on the Gregorian date's line; the night button is an outlined crescent with a
+  star; the prayer cells' am/pm markers are 20px.
+- Settings → What's new has 1.4.0.
 
 ## [1.3.5] - 2026-11-18
 
