@@ -1,8 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## [1.4.1] - 2026-11-25
 
 ### Changed
+- Settings → What's new has 1.4.1.
 - From a design review of every screen against Afnon's DESIGN.md: in night mode, Mist is #8C8679 (4.6:1 even on the
   radio card), the small gold words (the next prayer's tag and its ص/م, Settings' preview) take the night Dawn Gold,
   and the cards' label and secondary words reach 4.6-4.8:1 (were 3.5 and 2.9:1). The letter shown for an app with no

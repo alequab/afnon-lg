@@ -365,6 +365,8 @@
    */
   T.news = function () {
     if (this.ar) return [
+      ['1.4.1',
+        'الوضع الليلي أوضح للقراءة: النصوص الصغيرة وبطاقات التذكير'],
       ['1.4.0',
         'تذكير الصيام بعد كل صلاة قبل الصيام، والاثنين والخميس مفعّلان من البداية',
         'زر الصيام تحت التاريخ في الرئيسية يعيد عرض التذكير',
@@ -409,6 +411,8 @@
         'هذه الصفحة: ما الجديد في كل إصدار']
     ];
     return [
+      ['1.4.1',
+        'Night mode easier to read: the small text and the reminder cards'],
       ['1.4.0',
         "Fasting reminders after each prayer before the fast; Mondays and Thursdays on from the start",
         "A fasting chip under Home's date shows the reminder again",
