@@ -85,7 +85,7 @@
     // Minutes before the current prayer's time ends for «أوشك وقت صلاة … على الانتهاء»; 0 is off.
     endRemind: 15,
     // Which voluntary fasts remind the evening before: one bit per switch (Prayer.fastKind).
-    fasts: 63,
+    fasts: 127,
     // The fast's card once per prayer: its Hijri date and the prayer ("1448-6-13:4"); the first card per fast is
     // the full one (fastFull, its date), the later ones short. Home's chip is gold until opened (fastOpened).
     fasted: '', fastFull: '', fastOpened: ''

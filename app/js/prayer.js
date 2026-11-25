@@ -483,8 +483,8 @@
   /** Kinds; each but Thursday has its switch bit, and Thursday shares Monday's. */
   var WHITE_DAYS = 0, DHUL_HIJJAH = 1, ARAFAH = 2, TASUA = 3, ASHURA = 4, SHAWWAL = 5, MONDAY = 6, THURSDAY = 7;
   var FAST_SWITCHES = 7;
-  /** All on but Monday and Thursday, which would come twice a week. */
-  var FAST_DEFAULT = 63;
+  /** All on, Monday and Thursday too (the user's choice, 2026-11-25; Afnon leaves those two off). */
+  var FAST_DEFAULT = 127;
   /** A fast's card comes this long after each prayer's time, so the call and the prayer come first. */
   var FAST_AFTER_PRAYER_MS = 10 * 60000;
   /** The five prayers whose time brings a fast's card (Sunrise is not one). */

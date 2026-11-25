@@ -5,6 +5,8 @@
 From Afnon's TCL build (alequab's fork, `tcl-features` 2f76799, 1818031, 759c683, 5b5a95e) and cleanyourtv-WebOS #286.
 
 ### Changed
+- Mondays and Thursdays are on by default in Settings → Reminders → Fasting reminders (Afnon leaves them off).
+  Settings already saved keep their choice.
 - Fasting reminders come after each of the five prayers before a fast's suhoor: Fajr, Dhuhr and Asr of the day
   before, then Maghrib and Isha of its evening (Mondays and Thursdays once, after Maghrib). The first card for a fast
   is the full one; later ones are short (no hadith, 8 s). The service's toast over other apps follows the same
