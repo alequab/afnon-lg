@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+- From a design review of every screen against Afnon's DESIGN.md: in night mode, Mist is #8C8679 (4.6:1 even on the
+  radio card), the small gold words (the next prayer's tag and its ص/م, Settings' preview) take the night Dawn Gold,
+  and the cards' label and secondary words reach 4.6-4.8:1 (were 3.5 and 2.9:1). The letter shown for an app with no
+  icon is plaster, not gold, and 20px; Settings' preview ص/م is 20px.
+
 ## [1.4.0] - 2026-11-25
 
 From Afnon's TCL build (alequab's fork, `tcl-features` 2f76799, 1818031, 759c683, 5b5a95e) and cleanyourtv-WebOS #286.
