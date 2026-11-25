@@ -37,7 +37,8 @@
  */
 html.night {
   --lapis9: #0B0A08; --lapis8: #17140F; --lapis7: #221D16; --side: #090806; --callbg: #070605;
-  --gold: #84703F; --gold2: #93835C; --ink: #8F877A; --mist: #6A655C;
+  /* Mist #847E73: 4.9:1 on the night ground (was #6A655C, 3.4:1), as Afnon's night tokens. */
+  --gold: #84703F; --gold2: #93835C; --ink: #8F877A; --mist: #847E73;
   --line: rgba(143,135,122,0.22); --line-faint: rgba(143,135,122,0.1); --line-mid: rgba(143,135,122,0.45);
   --gold60: rgba(132,112,63,0.6); --gold45: rgba(132,112,63,0.45); --past: rgba(23,20,15,0.6);
   --scrim: rgba(11,10,8,0.94); --seg-focus: rgba(11,10,8,0.3); --bell-off: rgba(106,101,92,0.4);
@@ -292,6 +293,8 @@ html.night .appicon img { filter: brightness(0.6) sepia(0.25); }
 .fquote { margin-top: 14px; font-size: 22px; line-height: 1.5; }
 [dir=rtl] .fquote { font-family: Amiri, serif; font-size: 30px; }
 .fsrc { margin-top: 4px; font-size: 20px; color: var(--card-sub); }
+.fboth { margin-top: 10px; font-size: 22px; color: var(--card-lbl); }
+.fbothsrc { font-size: 20px; color: var(--card-sub); }
 .flast { display: flex; align-items: center; margin-top: 16px; font-size: 22px; }
 .flast .fdate { flex: 1; color: var(--card-sub); }
 .flast .fpill { padding: 6px 18px; border-radius: 999px; border: 2px solid var(--card-btn-line); }
@@ -422,7 +425,7 @@ html.night .appicon img { filter: brightness(0.6) sepia(0.25); }
 .offnote { margin-top: 20px; font-size: 24px; line-height: 1.5; color: var(--dream-ink); text-align: center; white-space: pre-line; }
 .offnote.ask { color: var(--dream-next); }
 /* AfnonDream: a 440×640 group pinned to the physical top-left and moved by transform; ink, dim and next. */
-.dgroup { position: absolute; top: 0; left: 0; width: 440px; height: 640px; transition: opacity 800ms ease; will-change: transform, opacity; }
+.dgroup { position: absolute; top: 0; left: 0; width: 440px; height: 640px; transform-origin: 0 0; transition: opacity 800ms ease; will-change: transform, opacity; }
 .dline { position: absolute; top: 0; left: 0; }
 .dline path { fill: none; stroke: var(--dream-line); stroke-width: 2; }
 .dcol { position: absolute; top: 190px; left: 20px; width: 400px; display: flex; flex-direction: column; align-items: center; text-align: center; }
@@ -460,3 +463,10 @@ html.night .appicon img { filter: brightness(0.6) sepia(0.25); }
 .callbtn.a { background: var(--lapis8); border: 2px solid var(--line); margin-top: 36px; }
 .callbtn.b { border: 2px solid var(--line); margin-top: 18px; }
 #now .hint { font-size: 22px; color: var(--mist); margin-top: 20px; }
+
+/* Home's fasting chip under the dates (Afnon's Home chip): gold outline and words until it is opened. */
+.fchip { position: relative; align-self: flex-start; display: inline-flex; align-items: center; height: 44px; margin-top: 6px; padding: 0 18px; border-radius: 22px; border: 2px solid var(--line); font-size: 22px; color: var(--ink); white-space: nowrap; }
+.fchip::after { border-radius: 28px; }
+[dir=rtl] .fchip svg { margin-left: 10px; }
+[dir=ltr] .fchip svg { margin-right: 10px; }
+.fchip.unread { border-color: var(--gold); color: var(--gold); }

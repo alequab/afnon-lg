@@ -1,5 +1,28 @@
 # Changelog
 
+## [Unreleased]
+
+From Afnon's TCL build (alequab's fork, `tcl-features` 2f76799, 1818031, 759c683, 5b5a95e) and cleanyourtv-WebOS #286.
+
+### Changed
+- Fasting reminders come after each of the five prayers before a fast's suhoor: Fajr, Dhuhr and Asr of the day
+  before, then Maghrib and Isha of its evening (Mondays and Thursdays once, after Maghrib). The first card for a fast
+  is the full one; later ones are short (no hadith, 8 s). The service's toast over other apps follows the same
+  prayers (`Prayer.fastSlot`, `fastDue`, `fastInfo`; `fastAfter` is gone).
+- The card's title names the day and its weekday («غدًا الاثنين: ثاني الأيام البيض», «غدًا الخميس: صيام 3 ذي
+  الحجة»); English keeps its short title. Its last row starts with the fast's weekday and Hijri date.
+- A fast that falls on a Monday or Thursday adds «يوافق يوم الاثنين، فاجمع فيه بين النيتين» and Ibn Baz's «وافق
+  خيرًا على خير» (Fatawa Nur ala al-Darb 16/434-435), whatever the Monday and Thursday switch says.
+- Home: the gold note after the date is now a chip under the dates, gold until opened; OK shows the card again,
+  until Back (2 minutes at most). Down from the header and Up from the favourites reach it.
+- Home's countdown is h:mm, rounded up, until the last 15 minutes, then m:ss; Prayer day keeps its seconds.
+- When the next prayer's adhan is off, the arch says «الأذان متوقف» instead of «الأذان 4:53».
+- The dim screen is 1.2× larger, and its fast line names the day.
+- Night mode's Mist is #847E73 (4.9:1 on the night ground, was 3.4:1).
+- The clean-up also blocks the ad servers of the TV's own LG services country (`<cc>.ad.lgsmartad.com`,
+  `<cc>.info.lgsmartad.com`), as cleanyourtv-WebOS does, so LG's ad manager is refused at once.
+- Test hook `test=fast&fast=N` takes `&both`, `&short` and `&pinned`.
+
 ## [1.3.5] - 2026-11-18
 
 ### Changed

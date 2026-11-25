@@ -294,6 +294,12 @@ clean() {
   # --no-block: contentminer can take a minute to stop.
   for u in $UNITS; do systemctl --no-block stop $u.service >/dev/null 2>&1; done
   if ! grep -q 'afnon-launcher' /etc/hosts; then
+    # lgsmartad.com has a server per country and LG's ad manager asks the one of the TV's LG services country:
+    # that one too, or it waits out a 10 s timeout where the network drops it (cleanyourtv-WebOS #286).
+    cc=$(luna-send -n 1 -w 5000 luna://com.webos.settingsservice/getSystemSettings \
+      '{"category":"option","keys":["smartServiceCountryCode2"]}' </dev/null 2>/dev/null |
+      sed -n 's/.*"smartServiceCountryCode2": *"\([A-Za-z][A-Za-z]\)".*/\1/p' | tr 'A-Z' 'a-z')
+    [ -n "$cc" ] && [ "$cc" != nl ] && ADS="$ADS $cc.ad.lgsmartad.com $cc.info.lgsmartad.com"
     cp /etc/hosts /tmp/afnon-hosts &&
       { echo "127.0.0.1 $ADS # afnon-launcher"; echo "::1 $ADS # afnon-launcher"; } >> /tmp/afnon-hosts &&
       mount --bind /tmp/afnon-hosts /etc/hosts

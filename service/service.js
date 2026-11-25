@@ -8,7 +8,7 @@
  *             ever brings Afnon to the front);
  *   announce  at the time, when its adhan is off and announcing is on: a toast and "حان الآن موعد صلاة …".
  *   end       before the current prayer's time ends: "أوشك وقت صلاة … على الانتهاء".
- *   fast      after Maghrib, the evening before a voluntary fast: a toast (the page's card on Home).
+ *   fast      after each prayer before a voluntary fast's suhoor: a toast (the page's card on Home).
  * The settings come from the page (configure) and travel in the activity's own params, so the chain carries on
  * without the page. Node 8: CommonJS, async/await, no newer syntax. prayer.js, text.js and adhan.js are the app's
  * own (app/js), copied in when it is packaged. Log: /tmp/afnon-launcher-service.log.
@@ -160,10 +160,14 @@ function events(s) {
                 out.push({ kind: 'end', prayer: i, time: end, at: end - s.endRemind * 60000 + 10000 });
             }
         }
-        // The evening before a voluntary fast, after Maghrib (20 s past the page's moment, so it is a moment of its
-        // own); its time is the fast's Fajr, when suhoor ends.
-        const fast = Prayer.fastAfter(clock, t[Prayer.MAGHRIB], s.hijri, s.fasts == null ? Prayer.FAST_DEFAULT : s.fasts);
-        if (fast) out.push({ kind: 'fast', prayer: Prayer.MAGHRIB, time: next[Prayer.FAJR], at: t[Prayer.MAGHRIB] + Prayer.FAST_AFTER_MAGHRIB_MS + 20000, fast });
+        // Before a voluntary fast, 10 minutes after each of the five prayers before its suhoor (Fajr, Dhuhr and Asr
+        // of the day before, Maghrib and Isha of its evening; Monday and Thursday after Maghrib only), 20 s past the
+        // page's moment so it is a moment of its own. Its time is the fast's Fajr, when suhoor ends.
+        const bits = s.fasts == null ? Prayer.FAST_DEFAULT : s.fasts;
+        for (const p of Prayer.FAST_PRAYERS) {
+            const fast = Prayer.fastDue(clock, t[p], p, s.hijri, bits);
+            if (fast) out.push({ kind: 'fast', prayer: p, time: next[Prayer.FAJR], at: t[p] + Prayer.FAST_AFTER_PRAYER_MS + 20000, fast });
+        }
     }
     return out.sort((a, b) => a.at - b.at);
 }
@@ -346,7 +350,7 @@ async function act(ev, s, opts) {
     if (ev.kind === 'fast') {
         // On Home the page shows its own card, with the hadith; over another app, a toast.
         if (pageHome) log('fast ' + ev.fast.kind + ': Afnon is on Home, its card shows it');
-        else log('fast ' + ev.fast.kind + ' toast -> ' + JSON.stringify(await toast(t.toastFast(ev.fast.kind, ev.fast.day, at))));
+        else log('fast ' + ev.fast.kind + ' toast -> ' + JSON.stringify(await toast(t.toastFast(ev.fast, at))));
         return;
     }
     if (ev.kind === 'voice') await voice(opts.clip || clipName('before_', ev, p.friday), opts);

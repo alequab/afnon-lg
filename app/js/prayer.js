@@ -485,8 +485,10 @@
   var FAST_SWITCHES = 7;
   /** All on but Monday and Thursday, which would come twice a week. */
   var FAST_DEFAULT = 63;
-  /** The fast's banner comes this long after Maghrib, so the call and the prayer come first. */
-  var FAST_AFTER_MAGHRIB_MS = 10 * 60000;
+  /** A fast's card comes this long after each prayer's time, so the call and the prayer come first. */
+  var FAST_AFTER_PRAYER_MS = 10 * 60000;
+  /** The five prayers whose time brings a fast's card (Sunrise is not one). */
+  var FAST_PRAYERS = [FAJR, DHUHR, ASR, MAGHRIB, ISHA];
   var MUHARRAM = 0, SHABAN = 7, RAMADAN = 8, SHAWWAL_M = 9, DHU_AL_HIJJAH = 11;
 
   function on(bits, kind) { return (bits & (1 << kind)) !== 0; }
@@ -512,14 +514,43 @@
     return -1;
   }
   /**
-   * The fast whose evening begins at this Maghrib (a moment): {kind, day, month, year} of the fast's Hijri date, or
-   * null. hijriAdjust is Settings' ±days.
+   * The latest of the five prayers whose time was FAST_AFTER_PRAYER_MS ago or more (an index), or -1. times are the
+   * day's moments; after Isha its Fajr may be tomorrow's, so Isha's slot lasts until midnight.
    */
-  function fastAfter(clock, maghrib, hijriAdjust, bits) {
-    var w = clock.wall(maghrib);
+  function fastSlot(times, nowMs) {
+    for (var i = FAST_PRAYERS.length - 1; i >= 0; i--) {
+      var p = FAST_PRAYERS[i];
+      if (times[p] + FAST_AFTER_PRAYER_MS <= nowMs) return p;
+    }
+    return -1;
+  }
+  /**
+   * A fast as its card, Home's chip and the dim screen show it: the fast's Hijri date and weekday (0 = Sunday), and
+   * whether it is also a Monday or Thursday (one fast, both intentions; whatever that switch says). key is its
+   * Hijri date; slotKey the date and the prayer ("eve" for the quiet ones, "today" before its Fajr).
+   */
+  function fastInfo(kind, h, weekday, slot) {
+    var key = h.year + '-' + h.month + '-' + h.day;
+    return {
+      kind: kind, day: h.day, month: h.month, year: h.year, weekday: weekday,
+      also: !fastQuiet(kind) && (weekday === 1 || weekday === 4),
+      key: key, slotKey: key + ':' + slot
+    };
+  }
+  /**
+   * Afnon's Fasts.next: the fast of the calendar day after this moment's, if its card is due after prayer slot (a
+   * fastSlot), or null. Each of the five prayers before its suhoor brings one: Fajr, Dhuhr and Asr of the day
+   * before, then Maghrib and Isha of its evening, so the second White Day's start after Fajr of the first. Monday
+   * and Thursday are quiet: once, after Maghrib. hijriAdjust is Settings' ±days.
+   */
+  function fastDue(clock, moment, slot, hijriAdjust, bits) {
+    if (slot < 0) return null;
+    var w = clock.wall(moment);
     var h = hijriOf(w.getUTCFullYear(), w.getUTCMonth(), w.getUTCDate() + 1 + (hijriAdjust | 0));
-    var kind = fastKind(h.month, h.day, (w.getUTCDay() + 1) % 7, bits);
-    return kind < 0 ? null : { kind: kind, day: h.day, month: h.month, year: h.year };
+    var weekday = (w.getUTCDay() + 1) % 7, kind = fastKind(h.month, h.day, weekday, bits);
+    if (kind < 0) return null;
+    if (fastQuiet(kind)) return slot >= MAGHRIB ? fastInfo(kind, h, weekday, 'eve') : null;
+    return fastInfo(kind, h, weekday, String(slot));
   }
   /** Monday and Thursday: a smaller card, with no extra lines. */
   function fastQuiet(kind) { return kind === MONDAY || kind === THURSDAY; }
@@ -598,7 +629,7 @@
     times: times, timesFor: timesFor, qibla: qibla, angles: angles, isFriday: isFriday, hijriOf: hijriOf,
     WHITE_DAYS: WHITE_DAYS, DHUL_HIJJAH: DHUL_HIJJAH, ARAFAH: ARAFAH, TASUA: TASUA, ASHURA: ASHURA,
     SHAWWAL_FAST: SHAWWAL, MONDAY: MONDAY, THURSDAY: THURSDAY, FAST_SWITCHES: FAST_SWITCHES, FAST_DEFAULT: FAST_DEFAULT,
-    FAST_AFTER_MAGHRIB_MS: FAST_AFTER_MAGHRIB_MS, FAST_SAMPLE: FAST_SAMPLE,
-    fastKind: fastKind, fastAfter: fastAfter, fastQuiet: fastQuiet, fastDots: fastDots
+    FAST_AFTER_PRAYER_MS: FAST_AFTER_PRAYER_MS, FAST_PRAYERS: FAST_PRAYERS, FAST_SAMPLE: FAST_SAMPLE,
+    fastKind: fastKind, fastSlot: fastSlot, fastInfo: fastInfo, fastDue: fastDue, fastQuiet: fastQuiet, fastDots: fastDots
   };
 });

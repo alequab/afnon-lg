@@ -86,8 +86,9 @@
     endRemind: 15,
     // Which voluntary fasts remind the evening before: one bit per switch (Prayer.fastKind).
     fasts: 63,
-    // The Hijri date ("1448-6-13") whose fast's card was shown, so it shows once.
-    fasted: ''
+    // The fast's card once per prayer: its Hijri date and the prayer ("1448-6-13:4"); the first card per fast is
+    // the full one (fastFull, its date), the later ones short. Home's chip is gold until opened (fastOpened).
+    fasted: '', fastFull: '', fastOpened: ''
   };
   var S = loadSettings();
 
@@ -350,11 +351,18 @@
   }
 
   /** mm:ss under an hour at 150px, h:mm:ss above at 120px; gold-200 outline inside the last 15 minutes. */
-  function renderCountdown(a, day, now, focused) {
+  /**
+   * calm (Home, a screen always on in the room): the seconds show only in the last APPROACH_S, when the arch turns
+   * to its approaching gold; before that the count is h:mm (0:39 too), rounded up, so nothing moves every second
+   * (Afnon's design review). Prayer day keeps its seconds.
+   */
+  function renderCountdown(a, day, now, focused, calm) {
     var left = Text.secondsUntil(day.nextTime, now);
-    var count = t.d(Text.duration(left, true));
+    var seconds = !calm || left <= APPROACH_S, shown = seconds ? left : Math.ceil(left / 60) * 60;
+    var count = t.d(seconds ? Text.duration(left, true)
+      : Math.floor(shown / 3600) + ':' + ('0' + Math.floor((shown % 3600) / 60)).slice(-2));
     setText(a.count, count);
-    var hours = left >= 3600;
+    var hours = shown >= 3600;
     if (a.hours !== hours) { a.hours = hours; a.count.classList.toggle('h', hours); a.head = null; }
     // Marcellus has no tabular digits (its 0 is nearly three 1s wide), so a centred countdown would sway every
     // second. It starts where the text is centred with average-width seconds, set again only when something
@@ -716,8 +724,24 @@
     home.date2 = el('div', 'mist', when);
     home.date2.style.cssText = 'margin-top:6px;font-size:24px';
     home.greg = el('span', null, home.date2);
-    // From a fast's evening until its Fajr, its name in gold after the date, in case its card was missed.
-    home.fastNote = el('span', 'gold', home.date2);
+    // From a fast's first card until its Fajr, a chip under the dates («غدًا الاثنين: ثاني الأيام البيض»), gold
+    // until opened; OK shows the card again (Afnon's Home chip). Up from the favourites, Down from the header.
+    var chip = home.fastChip = el('div', 't fchip', when);
+    home.fastChipIcon = chip.appendChild(icon('moon', 24, 1.8));
+    home.fastChipText = el('span', null, chip);
+    chip.style.display = 'none';
+    chip._ok = function () {
+      var f = home.fast;
+      if (!f) return;
+      // Under at= (a test) only until the page restarts, so the real fast's chip is still gold.
+      if (S.fastOpened !== f.key) {
+        S.fastOpened = f.key;
+        if (home.shift === 0) saveSettings();
+        chip.classList.remove('unread');
+      }
+      showFast(f, 'pinned');
+    };
+    chip._focus = function () { setArchFocused(false); setHints(home.hints, [t.hintOk(t.fastChip())]); };
 
     var gear = home.gear = placeEnd(el('div', 't gear', e), 96, 56, 72, 72);
     gear.appendChild(icon('gear', 34, 1.8));
@@ -783,7 +807,7 @@
 
   function setArchFocused(f) {
     home.archFocused = f;
-    if (home.day) renderCountdown(home.arch, home.day, Date.now() + home.shift, f);
+    if (home.day) renderCountdown(home.arch, home.day, Date.now() + home.shift, f, true);
   }
 
   /** Bars: rounded bars from a common baseline, resting as steps (RadioBars.REST), breathing while it plays. */
@@ -1223,7 +1247,7 @@
       home.day = dayAt(now + 1000);
       renderHomeMinute(now);
     }
-    renderCountdown(home.arch, home.day, now, home.archFocused);
+    renderCountdown(home.arch, home.day, now, home.archFocused, true);
   }
 
   function renderHomeMinute(now) {
@@ -1231,11 +1255,21 @@
     setTime(home.clock, now);
     setText(home.date1, hijriText(day) + t.sep() + t.city());
     setText(home.greg, t.gregorianDate(clock.wall(now)));
-    var fast = fastUpcoming(day, now);
-    setText(home.fastNote, fast ? t.sep() + t.fastHome(fast.kind, fast.tomorrow) : '');
+    var fast = home.fast = fastUpcoming(day, now);
+    var chip = home.fastChip;
+    if (fast) {
+      setText(home.fastChipText, t.fastHome(fast.kind, fast.day, fast.weekday, fast.tomorrow));
+      setIcon(home.fastChipIcon, FAST_ICONS[fast.kind]);
+      chip.classList.toggle('unread', S.fastOpened !== fast.key);
+    }
+    chip.style.display = fast ? '' : 'none';
+    if (!fast && cur === chip) focus(home.foot);
     var nextTime = clockText(day.nextTime);
     var label = t.nextPrayer(), name = n[day.nextIndex];
-    var sub = t.adhanAt() + ' ' + nextTime + t.sep() + t.city(), sub2 = '';
+    // When the next prayer's adhan is off (all of them, or its own bell), the arch says so instead of promising one:
+    // «4:53 ص · الأذان متوقف · قلقيلية» (Afnon's design review).
+    var adhanOn = S.adhan && S.bells[day.nextIndex];
+    var sub = (adhanOn ? t.adhanAt() + ' ' + nextTime : nextTime + t.sep() + t.bell(false)) + t.sep() + t.city(), sub2 = '';
     if (day.friday && day.nextIndex === DHUHR) label = t.jumuahLabel();
     if (day.kahf) sub2 = t.kahf();
     if (day.ramadan) {
@@ -1306,7 +1340,11 @@
     var living = Live.place >= 0;
     var head = home.header, hi = head.indexOf(cur), fi = home.favs.indexOf(cur), mi = home.more.indexOf(cur);
     var lastFav = home.lastFav == null ? 0 : home.lastFav;
-    if (cur === home.foot) to = toEnd || down ? (living ? home.lFull : tileNear(home.favs, lastFav)) : up ? head[0] : null;
+    var chip = home.fastChip.style.display === 'none' || living ? null : home.fastChip;
+    if (cur === home.fastChip) to = toStart ? home.foot : up ? head[0] : down ? tileNear(home.favs, lastFav) : null;
+    else if (chip && hi >= 0 && down) to = chip;
+    else if (chip && fi >= 0 && up) to = chip;
+    else if (cur === home.foot) to = toEnd || down ? (living ? home.lFull : tileNear(home.favs, lastFav)) : up ? head[0] : null;
     else if (hi >= 0) {
       to = toStart ? (hi > 0 ? head[hi - 1] : home.foot) : toEnd ? head[hi + 1] || null
         : down ? (living ? home.lFull : tileNear(home.favs, Math.min(hi, FAV_SLOTS - 1))) : null;
@@ -1527,31 +1565,38 @@
   // ---------------------------------------------------------------- the fasting card (Afnon's TCL build)
 
   /**
-   * The fast this moment is the evening or the night of: from 10 minutes after Maghrib (the Hijri date has already
-   * turned) until its Fajr. {kind, tomorrow, hijri day/month/year}, or null.
+   * The fast this moment comes before (Afnon's Fasts.upcoming): the one whose card is due after the latest prayer, so
+   * from 10 minutes after Fajr of the day before; else, from midnight until its Fajr, the fast that is today.
+   * Prayer.fastInfo plus tomorrow and suhoor (its Fajr), or null.
    */
   function fastUpcoming(d, nowMs) {
-    var tomorrow;
-    if (nowMs >= d.times[MAGHRIB] + P.FAST_AFTER_MAGHRIB_MS) tomorrow = true;
-    // After midnight, before Fajr (the only time but the evening when Fajr is still ahead): the fast is today.
-    else if (nowMs < d.times[FAJR]) tomorrow = false;
-    else return null;
-    var kind = P.fastKind(d.hijriMonth, d.hijriDay, d.weekday, S.fasts);
-    return kind < 0 ? null : { kind: kind, tomorrow: tomorrow, day: d.hijriDay, month: d.hijriMonth, year: d.hijriYear };
+    var f = P.fastDue(clock, nowMs, P.fastSlot(d.times, nowMs), S.hijri, S.fasts);
+    if (f) f.tomorrow = true;
+    // After midnight, before Fajr (Sunrise is still today's: after Isha the day's Fajr is tomorrow's).
+    else if (nowMs < d.times[FAJR] && nowMs < d.times[SUNRISE]) {
+      var kind = P.fastKind(d.hijriMonth, d.hijriDay, d.weekday, S.fasts);
+      if (kind < 0) return null;
+      f = P.fastInfo(kind, { day: d.hijriDay, month: d.hijriMonth, year: d.hijriYear }, d.weekday, 'today');
+      f.tomorrow = false;
+    } else return null;
+    f.suhoor = d.suhoorEnd;
+    return f;
   }
 
-  var FAST_CARD_MS = 20000, QUIET_CARD_MS = 8000;
+  var FAST_CARD_MS = 20000, QUIET_CARD_MS = 8000, PINNED_CARD_MS = 120000;
   /** Each kind's icon (Fasts.icon): the full moon, the Kaaba, Arafah's hill, the moon, and a calendar for Mon/Thu. */
   var FAST_ICONS = ['fullmoon', 'kaaba', 'mountain', 'moon', 'moon', 'moon', 'calendar', 'calendar'];
   /**
-   * A voluntary fast tomorrow: its icon, its day among its days as dots, the hadith on its virtue with the source,
-   * and the fast's date with suhoor's end as a pill; at the bottom end like the reminder card, with Got it. Monday
-   * and Thursday are quiet: title and date only, for less time.
+   * A voluntary fast (f: fastUpcoming): its icon, its day among its days as dots, the hadith on its virtue with the
+   * source, and the fast's weekday and date with suhoor's end as a pill; at the bottom end like the reminder card,
+   * with Got it. Monday and Thursday are quiet: title and date only, for less time. A fast on a Monday or Thursday
+   * adds «يوافق يوم الاثنين، فاجمع فيه بين النيتين» and Ibn Baz's words. mode 'short' (the prayers after its first
+   * card): no hadith or source, 8 s; 'pinned' (from Home's chip): until Back, 2 minutes at most.
    */
-  function showFast(kind, hijriDay, hijriMonth, suhoor) {
+  function showFast(f, mode) {
     if (!home.ready) return;
     if (home.card) dismissReminder();
-    var quiet = P.fastQuiet(kind);
+    var kind = f.kind, quiet = P.fastQuiet(kind), short = mode === 'short';
     var card = home.card = el('div', 'card fastcard' + (kind === P.ARAFAH ? ' arafah' : '') + (quiet ? ' quiet' : ''), home.el);
     placeEnd(card, 96, 0);
     card.style.top = '';
@@ -1560,53 +1605,63 @@
     row.appendChild(icon(FAST_ICONS[kind], quiet ? 52 : 64, 1.6, 'ficon'));
     var words = el('div', 'fwords', row);
     el('div', 'lbl caps', words, t.fastLabel());
-    el('div', 'title dispb', words, t.fastTitle(kind, hijriDay));
-    var detail = t.fastDetail(kind, hijriDay);
+    // One wording with Home's chip; English keeps its short title while the fast is tomorrow (the weekday would wrap
+    // it, and the last row names it anyway).
+    el('div', 'title dispb', words, quiet || (!t.ar && f.tomorrow) ? t.fastTitle(kind, f.day)
+      : t.fastHome(kind, f.day, f.weekday, f.tomorrow));
+    var detail = t.fastDetail(kind, f.day);
     if (detail) el('div', 'sub', words, detail);
-    var dots = P.fastDots(kind, hijriDay);
+    var dots = P.fastDots(kind, f.day);
     if (dots) {
       var dr = el('div', 'fdots', words);
       for (var i = 0; i < dots[0]; i++) el('i', i === dots[1] ? 'on' : null, dr);
     }
-    var virtue = quiet ? null : t.fastVirtue(kind);
+    if (f.also) {
+      el('div', 'fboth', words, t.fastBoth(f.weekday));
+      if (!short) el('div', 'fbothsrc', words, t.fastBothSource());
+    }
+    var virtue = quiet || short ? null : t.fastVirtue(kind);
     if (virtue) {
       el('div', 'frule', card);
       el('div', 'fquote', card, virtue);
       el('div', 'fsrc', card, t.fastSource(kind));
     }
     var last = el('div', 'flast', card);
-    el('span', 'fdate', last, t.fastDate(hijriDay, hijriMonth));
-    el('span', 'fpill', last, t.suhoorEnds(clockText(suhoor)));
+    el('span', 'fdate', last, t.fastDate(f.weekday, f.day, f.month));
+    el('span', 'fpill', last, t.suhoorEnds(clockText(f.suhoor)));
     var btns = el('div', 'btns', card);
     var ok = el('div', 't cbtn fill', btns, t.apOk());
     ok._ok = dismissReminder;
-    home.cardFor = suhoor;
+    home.cardFor = f.suhoor;
     home.cardOk = home.cardDay = ok;
     home.cardReturn = cur;
     focus(ok);
     setHints(home.hints, [t.hintOk(t.apOk()), t.hintBackHome().replace(t.home(), t.dismiss())]);
     clearTimeout(home.cardTimer);
-    home.cardTimer = setTimeout(function () { if (home.card === card) dismissReminder(); }, quiet ? QUIET_CARD_MS : FAST_CARD_MS);
+    home.cardTimer = setTimeout(function () { if (home.card === card) dismissReminder(); },
+      mode === 'pinned' ? PINNED_CARD_MS : quiet || short ? QUIET_CARD_MS : FAST_CARD_MS);
   }
   /**
-   * The fast's card, once for its date, when it is due and Home is in front. With at= (a test) it runs at Home's
-   * moved clock and remembers the date only until the page restarts, so the real evening still has its card.
+   * The fast's card, once per prayer before it, when it is due and Home is in front; the first for a fast is the full
+   * one. With at= (a test) it runs at Home's moved clock and remembers only until the page restarts, so the real
+   * day still has its cards.
    */
-  var testFasted = '';
+  var testFasted = '', testFull = '';
   function fastTick(nowMs) {
     if (screen !== home || home.card || dream.on || offv.on || ch.on) return;
     var test = home.shift !== 0;
     if (test) nowMs += home.shift;
     var d = test ? dayAt(nowMs) : watch.day, f = fastUpcoming(d, nowMs);
     if (!f || !f.tomorrow) return;
-    var key = f.year + '-' + f.month + '-' + f.day;
-    if (key === (test ? testFasted : S.fasted)) return;
-    if (test) testFasted = key;
+    if (f.slotKey === (test ? testFasted : S.fasted)) return;
+    var full = f.key !== (test ? testFull : S.fastFull);
+    if (test) { testFasted = f.slotKey; testFull = f.key; }
     else {
-      S.fasted = key;
+      S.fasted = f.slotKey;
+      S.fastFull = f.key;
       saveSettings();
     }
-    showFast(f.kind, f.day, f.month, d.suhoorEnd);
+    showFast(f, full ? null : 'short');
   }
 
   function cardKey(k) {
@@ -2831,7 +2886,9 @@
    * arch outline, the clock, the date and the next prayer. The group moves every 60 s with an 800 ms fade. After Settings → Radio → Screen off while listening (at once by default) the
    * panel goes off too. Any key comes back.
    */
-  var IDLE_MS = 5 * 60000, DRIFT_MS = 60000, FADE_MS = 800, DREAM_W = 440, DREAM_H = 640;
+  // The group is drawn at 440×640 and shown 1.2× larger (Afnon's screensaver, 2026-11-24): DREAM_W/H are its size on
+  // screen, for drifting inside the edges.
+  var IDLE_MS = 5 * 60000, DRIFT_MS = 60000, FADE_MS = 800, DREAM_SCALE = 1.2, DREAM_W = 440 * 1.2, DREAM_H = 640 * 1.2;
   var lastInput = Date.now();
   var dream = { on: false, start: 0, lastDrift: 0, minute: -1, dark: false, day: null };
 
@@ -2860,7 +2917,7 @@
     dream.ask.style.display = 'none';
   }
   function placeDream(x, y) {
-    dream.group.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)';
+    dream.group.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px) scale(' + DREAM_SCALE + ')';
   }
   function showDream() {
     if (dream.on) return;
@@ -2873,7 +2930,7 @@
     dream.group.style.visibility = '';
     dream.group.style.opacity = '';
     // The design's own spot first; drifting starts a minute later.
-    placeDream(1140, 250);
+    placeDream(1140, 200);
     dream.el.classList.add('on');
     tellService();
     note('dim screen on');
@@ -2908,7 +2965,7 @@
       setText(dream.next, names(d)[d.nextIndex] + ' ' + clockText(d.nextTime));
       // The evening before a fast until its Fajr: its name and suhoor's end.
       var fast = fastUpcoming(d, nowMs);
-      setText(dream.fname, fast ? t.fastHome(fast.kind, fast.tomorrow) : '');
+      setText(dream.fname, fast ? t.fastHome(fast.kind, fast.day, fast.weekday, fast.tomorrow) : '');
       if (fast) setIcon(dream.ficon, FAST_ICONS[fast.kind]);
       setText(dream.fsuhoor, fast ? t.suhoorEnds(clockText(d.suhoorEnd)) : '');
       dream.fast.style.display = fast ? '' : 'none';
@@ -3251,10 +3308,15 @@
       if (screen !== home) show('home');
       showReminder();
     } else if (kind === 'fast') {
-      // test=fast&fast=0..7 (Prayer's kinds): the fasting card with a sample date of that kind, now.
+      // test=fast&fast=0..7 (Prayer's kinds): the fasting card with a sample date of that kind, now; &both on a
+      // Monday (one fast, both intentions), &short as after its first card, &pinned as from Home's chip.
       if (screen !== home) show('home');
-      var sample = P.FAST_SAMPLE[(+p.fast | 0) % 8];
-      showFast((+p.fast | 0) % 8, sample[0], sample[1], dayAt(Date.now()).suhoorEnd);
+      var fk = (+p.fast | 0) % 8, sample = P.FAST_SAMPLE[fk];
+      var fw = p.both || fk === P.MONDAY ? 1 : fk === P.THURSDAY ? 4 : 3;
+      var tf = P.fastInfo(fk, { day: sample[0], month: sample[1], year: 1448 }, fw, 'test');
+      tf.tomorrow = true;
+      tf.suhoor = dayAt(Date.now()).suhoorEnd;
+      showFast(tf, p.pinned ? 'pinned' : p.short ? 'short' : null);
     } else if (kind === 'friday' || kind === 'ramadan' || kind === 'now') shiftTo(kind);
     // at=<ISO time>: Home's clock jumps there (e.g. a winter night in London, for a 12-hour countdown).
     if (p.at && !isNaN(Date.parse(p.at))) {

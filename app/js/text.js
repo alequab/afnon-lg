@@ -101,21 +101,56 @@
     if (kind === 1) return this.ar ? 'رواه البخاري' : 'al-Bukhari';
     return this.ar ? 'رواه مسلم' : 'Muslim';
   };
-  /** The fast's Hijri date, at the start of the card's last row. */
-  T.fastDate = function (hijriDay, hijriMonth) { return this.d(hijriDay + ' ' + this.hijriMonths()[hijriMonth]); };
-  /** Home's date line and the dim screen, from the evening before until Fajr. */
-  T.fastHome = function (kind, tomorrow) {
-    var ar = ['الأيام البيض', 'أيام ذي الحجة', 'يوم عرفة', 'يوم تاسوعاء', 'يوم عاشوراء', 'ست من شوال', 'صيام الاثنين', 'صيام الخميس'];
-    var en = ['White Day', 'Dhul-Hijjah', 'Arafah', "Tasu'a", 'Ashura', 'Six of Shawwal', "Monday's", "Thursday's"];
-    if (this.ar) return (tomorrow ? 'غدًا: ' : 'اليوم: ') + ar[kind];
-    return en[kind] + ' fast ' + (tomorrow ? 'tomorrow' : 'today');
+  /** The fast's weekday and Hijri date («الاثنين 13 جمادى الآخرة»), at the start of the card's last row. */
+  T.fastDate = function (weekday, hijriDay, hijriMonth) {
+    return this.d(this.weekdays()[weekday] + ' ' + hijriDay + ' ' + this.hijriMonths()[hijriMonth]);
   };
-  /** The service's toast while another app is in front. */
-  T.toastFast = function (kind, hijriDay, suhoor) {
-    return this.fastTitle(kind, hijriDay) + this.sep() + this.suhoorEnds(suhoor);
+  /**
+   * Home's chip, the dim screen and the card's title: which fast and which day of it, with its weekday while it is
+   * tomorrow («غدًا الاثنين: ثاني الأيام البيض»), or «اليوم» from midnight until its Fajr (Afnon's Text.fastHome).
+   */
+  T.fastHome = function (kind, hijriDay, weekday, tomorrow) {
+    var ar = this.ar, name;
+    switch (kind) {
+      case 0:
+        name = hijriDay === 13 ? (ar ? 'أول الأيام البيض' : 'First White Day')
+          : hijriDay === 14 ? (ar ? 'ثاني الأيام البيض' : 'Second White Day') : (ar ? 'آخر الأيام البيض' : 'Last White Day');
+        break;
+      case 1: name = this.d(ar ? 'صيام ' + hijriDay + ' ذي الحجة' : hijriDay + ' Dhul-Hijjah'); break;
+      case 2: name = ar ? 'يوم عرفة' : 'Arafah fast'; break;
+      case 3: name = ar ? 'يوم تاسوعاء' : "Tasu'a fast"; break;
+      case 4: name = ar ? 'يوم عاشوراء' : 'Ashura fast'; break;
+      case 5: name = ar ? 'ست من شوال' : 'Six of Shawwal'; break;
+      case 6: name = ar ? 'صيام الاثنين' : "Monday's fast"; break;
+      default: name = ar ? 'صيام الخميس' : "Thursday's fast";
+    }
+    // Monday's and Thursday's own fast: the weekday is already its name.
+    var weekly = kind === 6 || kind === 7, wd = this.weekdays()[weekday];
+    if (ar) return (tomorrow ? (weekly ? 'غدًا: ' : 'غدًا ' + wd + ': ') : 'اليوم: ') + name;
+    // English abbreviates the weekday, so a title fits one line.
+    wd = wd.slice(0, 3);
+    return name + (tomorrow ? (weekly ? ' tomorrow' : ' tomorrow, ' + wd) : ' today');
+  };
+  /**
+   * A fast that falls on a Monday or Thursday: one fast, both intentions. Ibn Baz, asked whether one may intend the
+   * Monday and a White Day together, answered for voluntary fasts «وافق خيرًا على خير» (Fatawa Nur ala al-Darb,
+   * ed. al-Shuway'ir, 16/434-435; checked in the Shamela library for Afnon).
+   */
+  T.fastBoth = function (weekday) {
+    var wd = this.weekdays()[weekday];
+    return this.ar ? 'يوافق يوم ' + wd + '، فاجمع فيه بين النيتين' : 'Also a ' + wd + ': one fast, both intentions';
+  };
+  T.fastBothSource = function () {
+    return this.ar ? '«وافق خيرًا على خير» ابن باز، فتاوى نور على الدرب' : '“Good upon good”: Ibn Baz, Fatawa Nur ala al-Darb';
+  };
+  /** Home's chip, in the hints: what OK on it does. */
+  T.fastChip = function () { return this.ar ? 'تذكير الصيام' : 'Fasting reminder'; };
+  /** The service's toast while another app is in front (f: Prayer.fastInfo). */
+  T.toastFast = function (f, suhoor) {
+    return this.fastHome(f.kind, f.day, f.weekday, true) + this.sep() + this.suhoorEnds(suhoor);
   };
   T.fastRow = function () { return this.ar ? 'تذكير الصيام' : 'Fasting reminders'; };
-  T.fastHelp = function () { return this.ar ? 'بعد المغرب، في الليلة التي تسبق الصيام' : 'After Maghrib, the evening before the fast'; };
+  T.fastHelp = function () { return this.ar ? 'بعد كل صلاة قبل الصيام، والاثنين والخميس بعد المغرب' : 'After each prayer before it; Mon and Thu after Maghrib'; };
   /** The row's list, in the order of the switch bits. */
   T.fastSwitches = function () {
     return this.ar ? [this.d('الأيام البيض (13 و14 و15)'), this.d('أيام ذي الحجة (1 إلى 8)'), 'يوم عرفة', 'تاسوعاء', 'عاشوراء', 'ست من شوال', 'الاثنين والخميس']

@@ -59,6 +59,14 @@
   العُمانية، والعشاء في رمضان بعد المغرب بساعتين في مدن السعودية، وقاعدة المدن الشمالية في الصيف. ويُعدَّل كل وقت
   بالدقائق (+ ٢ −) ليطابق مسجدك.
 - **اليوم الهجري يبدأ من المغرب:** ومعه رمضان، وسورة الكهف من مغرب الخميس، والجمعة حتى مغربها.
+- **تذكير بصيام التطوع:** الأيام البيض، وأيام ذي الحجة، ويوم عرفة، وتاسوعاء وعاشوراء، وست من شوال، والاثنين والخميس
+  (تختار منها ما تريد). يأتي التذكير بعد كل صلاة قبل السحور، مع الحديث في فضل الصيام ووقت انتهاء السحور، ويقول إن وافق
+  الصيامُ يومَ الاثنين أو الخميس. ولا تذكير في العيدين وأيام التشريق ورمضان ويوم الشك. وفي الرئيسية زر صغير يعيد
+  التذكير حتى الفجر.
+- **عدّ تنازلي هادئ:** ساعات ودقائق، ولا تظهر الثواني إلا في آخر ربع ساعة. وإن كان أذان الصلاة القادمة متوقفًا كتب
+  المحراب «الأذان متوقف».
+- **شاشة خافتة بدل شاشة توقف LG:** الساعة والصلاة القادمة في المحراب على خلفية سوداء، تتنقل كل دقيقة، ومعها الصيام
+  القادم إن وُجد.
 - **إذاعات القرآن الكريم والقرّاء،** و**البث المباشر من مكة المكرمة والمدينة المنورة** بدقة 1080p بضغطة واحدة.
 - **الوضع الليلي** لكل الشاشات، حتى أيقونات التطبيقات.
 - **الشاشة الرئيسية للتلفاز:** زر Home يفتح المشغّل بدل شريط LG، والضغط على «رجوع» في الرئيسية يعرض التطبيقات
@@ -165,6 +173,14 @@ Works on LG TVs with webOS 5 or newer, **rooted** with [Homebrew Channel](https:
   night. **Adjust the times** moves each one up to 30 minutes, to match your mosque.
 - **The Hijri day starts at Maghrib**, and Ramadan, Surat al-Kahf (Thursday's Maghrib to Friday's) and Jumu'ah
   (Friday until its Maghrib) follow it. A Hijri adjustment of ±2 days for local moon sighting.
+- **Voluntary fasting reminders:** the White Days, the days of Dhul-Hijjah, Arafah, Tasu'a and Ashura, six of
+  Shawwal, and Mondays and Thursdays (pick which). A card after each prayer before the fast's suhoor, with the
+  hadith on its virtue and when suhoor ends; it says so when the fast falls on a Monday or Thursday too. None on the
+  two Eids, the Days of Tashriq, in Ramadan or on the day of doubt. A chip on Home shows it again until its Fajr.
+- **A calm countdown:** hours and minutes, with seconds only in the last 15 minutes. When the next prayer's adhan
+  is off, the arch says «الأذان متوقف».
+- **A dim screen instead of LG's screensaver:** the clock and the next prayer in the arch on black, moving every
+  minute, with the coming fast if there is one.
 - **Quran radio** (Quran stations and ten reciters' channels) and **live Makkah and Madinah** in up to 1080p,
   with Screen off while listening.
 - **Night mode** on every screen, app icons dimmed too.
@@ -182,8 +198,9 @@ Works on LG TVs with webOS 5 or newer, **rooted** with [Homebrew Channel](https:
 webOS doesn't let an app become the Home screen or list other apps, so a small boot script
 (`boot/90-afnon-launcher`, which Homebrew Channel runs at every boot) does what the app can't:
 
-1. Gives the launcher the permissions to list and open apps, read the network name and use its own service, and
-   lets the service see what is on screen so the adhan can go back to it.
+1. Gives the launcher the permissions to list and open apps, read the network name, use its own service and answer
+   LG's screensaver (it says no while it is in front, and shows its own dim screen), and lets the service see what
+   is on screen so the adhan can go back to it.
 2. Copies each app's icon into the launcher's folder (the TV doesn't let a web app read other apps' folders),
    again whenever an app is installed or removed.
 3. Opens the launcher when the TV turns on, and makes it the TV's "last input" as it turns off, so the TV starts
@@ -195,7 +212,8 @@ webOS doesn't let an app become the Home screen or list other apps, so a small b
    the stand-in opens the launcher. If the stand-in isn't running within 30 s, LG's Home comes back by itself.
 6. While the launcher is Home, a minute after boot: do-nothing stubs are bind-mounted over `admanager`,
    `adoverlay-service`, `acr2` (LivePlus) and `sportsalarm`; `remotelogger`, `service-logger`, `contentminer` and
-   `nudge` are stopped; and LG's ad servers go to 127.0.0.1 in a RAM copy of `/etc/hosts`. LG's own Home needs the
+   `nudge` are stopped; and LG's ad servers, with those of the TV's own LG services country, go to 127.0.0.1 in a
+   RAM copy of `/etc/hosts`. LG's own Home needs the
    ad services, so giving Home back to LG lifts this first.
 
 Steps 5 and 6 are mounts in RAM: nothing on the TV's disk changes, and a restart without the boot script (or
@@ -267,7 +285,8 @@ its service): uninstall it (Homebrew Channel or `appInstallService/dev/remove`),
 
 `node tools/serve.js` serves the launcher at http://localhost:8720 with the TV stubbed (arrows, Enter, Esc).
 Test hooks in the address: `locale=ar|en`, `digits=western|eastern`, `set=city:makkah,night:1`,
-`open=day|settings|apps|radio`, `at=<ISO time>` (the clock jumps there), `call=<prayer>&time=<ms>` (the call screen),
+`open=day|settings|apps|radio`, `at=<ISO time>` (the clock jumps there), `test=fast&fast=0..7` (a fasting card;
+`&both`, `&short`, `&pinned`), `test=dim` (the dim screen), `call=<prayer>&time=<ms>` (the call screen),
 `live=makkah`, `keys=down,ok,back`, `cityclock=1` (the city's clock, not the browser's) and `shot=1` (unscaled).
 The website is `site/` with the screenshots and the app itself as its demo; `tools\site.ps1` builds it and
 publishes it to the `gh-pages` branch, which GitHub Pages serves.
