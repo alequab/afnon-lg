@@ -1,22 +1,18 @@
-<div dir="rtl" align="center">
+<div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/opening-dark.png">
-  <source media="(prefers-color-scheme: light)" srcset="docs/opening-light.png">
-  <img src="docs/opening-dark.png" alt="بسم الله الرحمن الرحيم، والصلاة والسلام على نبينا محمد" width="560">
-</picture>
+<h3 dir="rtl">بسم الله الرحمن الرحيم</h3>
 
-<br>
+<h3 dir="rtl">والصلاة والسلام على نبينا محمد</h3>
 
-<h2>أفنون LG</h2>
+<h4 dir="rtl">أفنون LG&rlm; · Afnon LG</h4>
 
-**مواقيت الصلاة والأذان شاشةً رئيسية لتلفاز LG بعد الروت**
+<p dir="rtl"><b>مواقيت الصلاة والأذان شاشةً رئيسية لتلفاز LG بعد الروت</b></p>
 
-*Afnon LG: prayer times and the adhan as the Home screen of a rooted LG TV*
+<p>Afnon LG: prayer times and the adhan as the Home screen of a rooted LG TV</p>
 
-<br>
+<p dir="rtl"><a href="#العربية">العربية</a> · <a href="#المزايا">المزايا</a> · <a href="#install-ar">التثبيت</a></p>
 
-### [العربية](#العربية) &nbsp;·&nbsp; [English](#english)
+<p><a href="#english">English</a> · <a href="#features">Features</a> · <a href="#install">Install</a></p>
 
 </div>
 
@@ -37,11 +33,11 @@
 
 ![الشاشة الرئيسية](docs/screenshots/home-ar.png)
 
-> **أفنون من إنشاء [egyjs](https://github.com/egyjs)**:
-> [egyjs/afnon-android-tv-launcher](https://github.com/egyjs/afnon-android-tv-launcher). التصميم والمزايا منه،
-> وهذا المستودع ينقلها إلى تلفازات LG بالرخصة نفسها (MIT). شكرًا لـ egyjs.
-> يتولّى [alequab](https://github.com/alequab) صيانة هذا النقل، فأبلغ عن مشكلات تلفاز LG
-> [هنا](https://github.com/alequab/afnon-lg/issues) لا في مستودع أفنون.
+**أفنون من إنشاء [egyjs](https://github.com/egyjs)**:
+[egyjs/afnon-android-tv-launcher](https://github.com/egyjs/afnon-android-tv-launcher). التصميم والمزايا منه،
+وهذا المستودع ينقلها إلى تلفازات LG بالرخصة نفسها (MIT). شكرًا لـ egyjs.
+يتولّى [alequab](https://github.com/alequab) صيانة هذا النقل، فأبلغ عن مشكلات تلفاز LG
+[هنا](https://github.com/alequab/afnon-lg/issues) لا في مستودع أفنون.
 
 يعمل على تلفازات LG بنظام webOS 5 فأحدث، **بعد الروت** ([Homebrew Channel](https://github.com/webosbrew/webos-homebrew-channel)،
 والروت بأداة [SlopBro](https://github.com/throwaway96/slopbro))، ولا يحتاج أي تطبيق آخر.
@@ -113,11 +109,11 @@
 
 **إن كان عندك نسخة المتجر من أفنون LG** (`tv.afnon.lg`) فاحذفها بعد التثبيت، وإلا رُفع الأذان مرتين.
 
-**لإرجاع شاشة LG الرئيسية** حتى إعادة التشغيل التالية: `/var/lib/webosbrew/init.d/90-afnon-launcher lg-home`، ولإبقائها
+**لإرجاع شاشة LG الرئيسية** حتى إعادة التشغيل التالية: &lrm;`/var/lib/webosbrew/init.d/90-afnon-launcher lg-home`&lrm;، ولإبقائها
 دائمًا: `touch /var/lib/afnon-launcher/no-home`. ولإبقاء خدمات LG تعمل مع بقاء المشغّل شاشةً رئيسية:
 `touch /var/lib/afnon-launcher/no-debloat`.
 
-**لإزالته:** شغّل أمر `lg-home` السابق، واحذف `/var/lib/webosbrew/init.d/90-afnon-launcher` و`/var/lib/afnon-launcher`
+**لإزالته:** شغّل أمر `lg-home` السابق، واحذف &lrm;`/var/lib/webosbrew/init.d/90-afnon-launcher`&lrm; و&lrm;`/var/lib/afnon-launcher`&lrm;
 من التلفاز، ثم احذف تطبيق **Afnon LG** (`tv.afnon.launcher`) وأعد تشغيل التلفاز.
 
 </div>
