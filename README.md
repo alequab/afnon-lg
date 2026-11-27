@@ -94,14 +94,17 @@
    وتبقى هذه الملفات على التلفاز مع كل تحديث.
 3. اعرف عنوان IP للتلفاز: **الإعدادات ← الشبكة** (مثل `192.168.0.10`).
 4. ثبّت التطبيق وسكربت الإقلاع بهذا الأمر، مع وضع عنوان تلفازك:
-   <div dir="ltr">
 
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File tools\install-tv.ps1 -Tv <TV IP>
-   ```
-   </div>
+</div>
 
-   ينزّل التلفاز الحزمة من حاسوبك، وقد يسألك ويندوز مرة واحدة أن تسمح لـ Node بالمرور من جدار الحماية.
+```powershell
+powershell -ExecutionPolicy Bypass -File tools\install-tv.ps1 -Tv <TV IP>
+```
+
+<div dir="rtl" lang="ar">
+
+ينزّل التلفاز الحزمة من حاسوبك، وقد يسألك ويندوز مرة واحدة أن تسمح لـ Node بالمرور من جدار الحماية.
+
 5. أطفئ التلفاز وشغّله: يفتح المشغّل أولًا.
 
 **بعد ذلك** يتحدّث التلفاز وحده من [إصدارات هذا المستودع](https://github.com/alequab/afnon-lg/releases)
